@@ -72,10 +72,10 @@ func _ready() -> void:
 	assert(koopa.body.get_node("CollisionShape2D").shape.size == Vector2(14, 16))
 	assert(koopa.get_node("Body/PlayerContact/CollisionShape2D").shape.size == Vector2(12, 12))
 	assert(koopa.get_node("Body/PlayerContact").position == Vector2(0, -1))
-	assert(koopa.sprite.hframes == 5 and koopa.sprite.position == Vector2(0, -8))
+	assert(koopa.sprite.hframes == 5 and koopa.sprite.position == Vector2(0, -7))
 	assert(
-		koopa.sprite.position.y + koopa.sprite.get_rect().end.y == 8,
-		"Art feet must align with the body's bottom."
+		koopa.sprite.position.y + koopa.sprite.get_rect().end.y == 9,
+		"Art feet extend one pixel below the terrain body."
 	)
 	assert(not koopa.sprite.flip_h)
 	assert(koopa._can_hurt_player())

@@ -54,6 +54,7 @@ input_enabled = false
 
 [node name="Squashed" type="Node" parent="StateMachine" index="1" unique_id=190285455]
 script = ExtResource("defeated")
+defeat_sprite_y_offset = 1.0
 stop_animation_on_enter = true
 sprite_frame = 2
 frame_updates_enabled = false
@@ -68,6 +69,7 @@ frame_updates_enabled = false
 input_enabled = false
 
 [node name="Sprite2D" parent="Body" index="1"]
+position = Vector2(0, 1)
 texture = ExtResource("art")
 hframes = 3
 

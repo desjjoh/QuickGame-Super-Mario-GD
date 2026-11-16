@@ -48,6 +48,15 @@ func begin(values: MotionValues, floor_supported: bool = false) -> bool:
 	return true
 
 
+## External launches use the current falling profile and preserve the position fraction.
+func launch_with_falling_gravity(values: MotionValues, speed: float) -> void:
+	active = true
+	_released = true
+	_origin_y = values.body.global_position.y
+	values.body.velocity.y = speed
+	update(values, false)
+
+
 func update(values: MotionValues, held: bool) -> void:
 	if not active:
 		return

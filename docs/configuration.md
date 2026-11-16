@@ -58,7 +58,7 @@ Open `scenes/main/game.tscn`, select **Game**, and assign **Presentation → Tit
 
 Add a `Marker2D` under **Players** at the desired feet position and assign it to the level's **Death → Halfway Spawn** field. On **Areas → MainArea → Camera2D**, enable **Halfway Restart → Halfway Check Enabled** and set **Halfway Camera Left** in pixels from the main area's origin. The 2D editor draws a labeled dashed guide that moves with the area. At life loss, the active camera and the threshold are compared in world coordinates.
 
-1-1 uses a marker at `(1328, 208)` and a camera-left threshold of `1280`. 1-2 uses `(1584, 208)` and `1536`. These coordinates are relative to each stage's main area. At a halfway restart, the camera starts at the threshold and Mario's sprite starts 40 px from the left edge. Main-area deaths before the threshold use PlayerSpawn. Side-area deaths use the active camera's world position, so 1-1's authored secret room restarts at PlayerSpawn and 1-2's authored bonus room uses the halfway marker.
+1-1 uses a marker at `(1328, 208)` and a camera-left threshold of `1280`. 1-2 uses `(1584, 208)` and `1536`. 1-3 uses `(1072, 208)` and `1024`. These coordinates are relative to each stage's main area. At a halfway restart, the camera starts at the threshold and Mario's sprite starts 40 px from the left edge. Main-area deaths before the threshold use PlayerSpawn. Side-area deaths use the active camera's world position, so 1-1's authored secret room restarts at PlayerSpawn and 1-2's authored bonus room uses the halfway marker.
 
 On the first main-area load of a halfway restart, EnemyLayout placements with a spawn trigger left of the last visible pixel are skipped for that area load. In 1-2 this skips the Goomba triplet near the checkpoint. Enemies with triggers at or beyond the right edge and occupants attached to pipes can spawn normally.
 
@@ -82,7 +82,7 @@ Each mouth has one occupant entry. Decorative, entrance, and exit pipes can all 
 
 Add standard marker-to-scene mappings to **BaseLevel: Entity Scenes** in scenes/levels/base/base_level.tscn. Levels inherit this registry. Do not create a per-level dictionary override: Godot replaces the inherited dictionary rather than merging entries. Levels own their painted placements and reward overrides.
 
-The game uses 256×240 logical framing with window-resolution canvas_items rendering. The bordered, resizable window starts at 768×720; fractional aspect-preserving scaling fits other sizes with bars as needed. Shader masks can render smoothly while foreground artwork uses nearest sampling.
+The game uses 256×240 logical framing with window-resolution canvas_items rendering. The bordered, resizable window starts at 768×720; fractional aspect-preserving scaling fits other sizes with bars as needed. Enable **Game → Presentation → Integer Scaling** to fit the canvas at a whole-number scale. At 900×844, the setting centers a 768×720 canvas inside the window. Shader masks can render smoothly while foreground artwork uses nearest sampling.
 
 ## Source configuration and ownership
 
@@ -92,11 +92,13 @@ Use typed GameHandler methods/properties and `player_status` for score, coins, l
 
 In `scenes/main/game.tscn`, select **Game → Gameplay → Enemy Limit** to set the number of enemies that can be active at once. The default is **5** and standalone level previews also use five. Set it to **0** to disable enemy spawns. The single power-up slot is independent. Ordinary painted spawners attempt once per area load and do not retry after rejection. Reward blocks may explicitly replace the current power-up. Unlisted categories remain unlimited and untracked.
 
-Paint one **Goomba Pair Spawner**, **Goomba Triplet Spawner**, or **Green Koopa Pair Spawner** marker on the 16×16 **EnemyLayout** at the first member's placement. The marker creates the group together at the camera's right edge, with members 24 pixels apart. If the group runs out of enemy slots during activation, the remaining members are skipped for that area load.
+Paint one **Goomba Pair Spawner**, **Goomba Triplet Spawner**, or **Green Koopa Pair Spawner** marker on the 16×16 **EnemyLayout** at the NES trigger column. The group activates when the marker enters the 48-pixel lookahead. Its first member starts at the last visible pixel on the camera's right edge, with members 24 pixels apart. The editor draws the trigger in gold and outlines each member's spawn cell in cyan at the first eligible camera position. Toggle **Show Group Spawn Preview** on **EnemyLayout** to hide the guides. If the group runs out of enemy slots during activation, the remaining members are skipped for that area load.
 
 Paint **Red Koopa Spawner** on **EnemyLayout** in the cell immediately above its support. A walking Red Koopa turns at ledges, and its kicked shell can roll off them.
 
 Paint **Red Parakoopa Spawner** on **EnemyLayout** to place a Red Koopa that flies vertically. The marker sets its starting position. Its flight range follows the reference's starting-height rule. The first stomp removes its wings and awards 400 points, after which it walks and uses the shared shell states. In 1-3 the two markers are at (74, 4) and (114, 5).
+
+Paint **Green Parakoopa Spawner** on **EnemyLayout** for the hopping variant. Each marker activates one enemy at that cell. The 2-1 markers are at (151, 12), (169, 12), and (171, 12).
 
 ## Place moving lifts
 
@@ -111,6 +113,10 @@ Both spawners offer **Platform Width**. Small, Medium, and Large are 32, 48, and
 On a single lift, leave **Travel Distance** at −1 to use the original oscillation, or set it to 0 for a fixed platform. A positive value sets the distance from the marker to the turn point, left for horizontal lifts and down for vertical lifts. The lift travels back and forth at 15/16 pixel per physics tick. In 1-4, the Small horizontal lift uses the original oscillation.
 
 The 2D editor draws a cyan travel line and surfaces at the selected width. Single lifts show the travel span and starting surface. Repeating lanes show the full cycle and the starting surfaces from **Initial Offsets**.
+
+## Paint springboards
+
+Paint **Springboard** on **EntityLayout**. The painted cell is the top of the uncompressed spring. In 2-1 it is at (188, 11), before the wall at columns 190–191. Jump onto it and press Jump again during compression for the high bounce.
 
 ## Place a castle bridge
 

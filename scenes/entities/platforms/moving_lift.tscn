@@ -10,6 +10,7 @@ persist_progress = false
 texture_filter = 1
 
 [node name="Presentation" type="Node2D" parent="."]
+position = Vector2(0, 1)
 
 [node name="Left" type="Sprite2D" parent="Presentation"]
 texture = ExtResource("art")

@@ -23,6 +23,7 @@
 [ext_resource type="Resource" uid="uid://chfcnww7r30v7" path="res://assets/themes/underground.tres" id="underground"]
 [ext_resource type="PackedScene" path="res://scenes/entities/warp_zone/warp_zone_pipe.tscn" id="warp_pipe"]
 [ext_resource type="PackedScene" uid="uid://dhytccbi1u2jb" path="res://scenes/levels/worlds/world 1/1-1.tscn" id="warp_stage"]
+[ext_resource type="PackedScene" uid="uid://y0wmdsmhed65" path="res://scenes/levels/worlds/world 2/2-1.tscn" id="warp_stage_2"]
 [ext_resource type="PackedScene" path="res://scenes/entities/warp_zone/warp_zone.tscn" id="warp_zone"]
 
 [sub_resource type="Resource" id="BonusDestination"]
@@ -89,6 +90,10 @@ kind = 3
 script = ExtResource("transport_destination")
 stage_scene = ExtResource("warp_stage")
 
+[sub_resource type="Resource" id="WarpDestination2"]
+script = ExtResource("transport_destination")
+stage_scene = ExtResource("warp_stage_2")
+
 [sub_resource type="Resource" id="BonusReturnDestination"]
 script = ExtResource("transport_destination")
 area_id = &"main"
@@ -127,8 +132,8 @@ entrance_enabled = false
 texture_filter = 1
 ending_presentation = NodePath("Presentations/FlagpoleEnding")
 opening_presentation = NodePath("Presentations/PipeOpening")
-halfway_spawn = NodePath("Players/HalfwaySpawn")
 stage_label = "1-2"
+halfway_spawn = NodePath("Players/HalfwaySpawn")
 player_scene = ExtResource("player")
 
 [node name="MainArea" parent="Areas" parent_id_path=PackedInt32Array(638828059) index="0" unique_id=250103957]
@@ -169,12 +174,13 @@ tile_map_data = PackedByteArray("AAAAAAQAAgAAAAAAAAAAAAUAAgAAAAAAAAAAAAYAAgAAAAA
 tile_set = ExtResource("6_q82u4")
 
 [node name="EnemyLayout" parent="Areas/MainArea/Layouts" parent_id_path=PackedInt32Array(250103957, 1417906807) index="3" unique_id=1742010551]
-tile_map_data = PackedByteArray("AAAQAAwAAAAAAAAAAAARAAsAAAAAAAAAAAAdAAwAAAAAAAAAAAAsAAwABAAAAAAAAAA7AAwAAgAAAAAAAAA+AAwAAAAAAAAAAABAAAwAAAAAAAAAAABJAAQAAAAAAAAAAABMAAgAAQAAAAAAAABjAAwAAwAAAAAAAABxAAwAAAAAAAAAAACHAAgAAQAAAAAAAACSAAwABQAAAAAAAAA=")
+tile_map_data = PackedByteArray("AAAQAAwAAAAAAAAAAAARAAsAAAAAAAAAAAAdAAwAAAAAAAAAAAAvAAwABAAAAAAAAAA7AAwAAgAAAAAAAAA+AAwAAAAAAAAAAABAAAwAAAAAAAAAAABJAAQAAAAAAAAAAABPAAgAAQAAAAAAAABmAAwAAwAAAAAAAABxAAwAAAAAAAAAAACKAAgAAQAAAAAAAACSAAwABQAAAAAAAAA=")
 tile_set = ExtResource("7_u3lxh")
 
 [node name="DescendingLifts" parent="Areas/MainArea/WorldObjects" parent_id_path=PackedInt32Array(250103957, 827174942) index="0" unique_id=974125788 instance=ExtResource("15_78tmy")]
 position = Vector2(2236, -8)
 direction = 1
+platform_width = 3
 initial_offsets = Array[int]([120, 216])
 spawn_category = &""
 actor_offsets = Array[Vector2]([Vector2(0, 0)])
@@ -182,6 +188,7 @@ actor_offsets = Array[Vector2]([Vector2(0, 0)])
 [node name="AscendingLifts" parent="Areas/MainArea/WorldObjects" parent_id_path=PackedInt32Array(250103957, 827174942) index="1" unique_id=369288648 instance=ExtResource("15_78tmy")]
 position = Vector2(2476, 248)
 direction = -1
+platform_width = 3
 initial_offsets = Array[int]([232, 104])
 spawn_category = &""
 actor_offsets = Array[Vector2]([Vector2(0, 0)])
@@ -220,7 +227,7 @@ destination_area_id = &"lower"
 destination_endpoint_id = &"arrival"
 alignment_tolerance = 4.0
 transport_id = &"warp_2"
-destination = SubResource("WarpDestination")
+destination = SubResource("WarpDestination2")
 exit_distance = 96.0
 
 [node name="Arrival" parent="Areas/MainArea" index="3" unique_id=1254188347]
@@ -351,7 +358,7 @@ position = Vector2(160, 240)
 [node name="PlayerSpawn" parent="Players" index="0" unique_id=321075723]
 position = Vector2(48, 208)
 
-[node name="HalfwaySpawn" type="Marker2D" parent="Players" index="1"]
+[node name="HalfwaySpawn" type="Marker2D" parent="Players" index="1" unique_id=1779157653]
 position = Vector2(1584, 208)
 
 [node name="PipeOpening" type="Node" parent="Presentations" index="0" unique_id=113248238 node_paths=PackedStringArray("intro_area")]

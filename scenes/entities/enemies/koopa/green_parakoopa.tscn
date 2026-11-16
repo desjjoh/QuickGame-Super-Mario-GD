@@ -1,0 +1,18 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/entities/enemies/koopa/green_koopa.tscn" id="base"]
+[ext_resource type="Script" path="res://scenes/entities/enemies/koopa/parakoopa.gd" id="parakoopa"]
+[ext_resource type="Script" path="res://scripts/states/enemies/green_parakoopa_hop.gd" id="hop"]
+
+[node name="GreenParakoopa" instance=ExtResource("base")]
+script = ExtResource("parakoopa")
+face_attacker_after_stomp = false
+wing_loss_score_delay = 5
+
+[node name="StateMachine" parent="." index="0" node_paths=PackedStringArray("initial_state")]
+initial_state = NodePath("Flying")
+
+[node name="Flying" type="Node" parent="StateMachine" index="5"]
+script = ExtResource("hop")
+frame_updates_enabled = false
+input_enabled = false

@@ -49,7 +49,7 @@ func _ready() -> void:
 	# Pair reference timing uses the group trigger and creates both members at the right edge.
 	camera.position.x = 560 + 128
 	var pair := GOOMBA_PAIR_SPAWNER.instantiate() as EntitySpawner
-	pair.position = Vector2(816, 192)
+	pair.position = Vector2(864, 192)
 	level.world_objects.add_child(pair)
 	area.update_camera_activity()
 	assert(pair.get_child_count() == 1)
@@ -83,6 +83,7 @@ func _ready() -> void:
 	await get_tree().process_frame
 	await check_painted_group(3, "goomba_triplet_spawner", &"Goomba", 3)
 	await check_painted_group(4, "green_koopa_pair_spawner", &"GreenKoopa", 2)
+	await check_world_two_groups()
 	print("enemy_boundary_test: PASS")
 	await preload("res://tests/fixtures/finish_test.gd").finish(get_tree())
 
@@ -90,7 +91,7 @@ func _ready() -> void:
 func check_spawn_beyond_cleanup(level: BaseLevel, area: BaseLevelArea) -> void:
 	# At this camera position, the pair starts at X816 and cleanup starts at X889.
 	var pair := GOOMBA_PAIR_SPAWNER.instantiate() as EntitySpawner
-	pair.position = Vector2(816, 192)
+	pair.position = Vector2(864, 192)
 	pair.actor_offsets = [Vector2.ZERO, Vector2(80, 0)]
 	level.world_objects.add_child(pair)
 	area.update_camera_activity()
@@ -126,7 +127,7 @@ func check_painted_group(source_id: int, marker_id: String, first_name: StringNa
 	level.entity_layout.clear()
 	var layout := level.get_node("Areas/MainArea/Layouts/EnemyLayout") as TileMapLayer
 	layout.clear()
-	layout.set_cell(Vector2i(51, 12), source_id, Vector2i.ZERO)
+	layout.set_cell(Vector2i(54, 12), source_id, Vector2i.ZERO)
 	var ground := level.get_node("Areas/MainArea/Layouts/GroundLayout") as TileMapLayer
 	ground.clear()
 	for x in range(80):
@@ -137,7 +138,7 @@ func check_painted_group(source_id: int, marker_id: String, first_name: StringNa
 	add_child(level)
 	var area := level.active_area
 	area.set_physics_process(false)
-	var spawner := level.world_objects.get_node(marker_id + "_51_12") as EntitySpawner
+	var spawner := level.world_objects.get_node(marker_id + "_54_12") as EntitySpawner
 	assert(spawner.get_node_or_null(NodePath(first_name)) == null)
 
 	camera.position.x += 1.0
@@ -166,3 +167,49 @@ func check_painted_group(source_id: int, marker_id: String, first_name: StringNa
 	assert(last.body.global_position.x - 8.0 <= 816.0)
 	level.queue_free()
 	await get_tree().process_frame
+
+
+func check_world_two_groups() -> void:
+	var stage := preload("res://scenes/levels/worlds/world 2/2-1.tscn")
+	var groups := {
+		"goomba_pair_spawner_45_12": 2,
+		"goomba_triplet_spawner_71_12": 3,
+		"goomba_triplet_spawner_90_12": 3,
+	}
+	for marker: String in groups:
+		var level := stage.instantiate() as BaseLevel
+		add_child(level)
+		var area := level.active_area
+		area.set_physics_process(false)
+		var camera := area.get_node("Camera2D") as LevelCamera
+		camera.follow_enabled = false
+		var spawner := level.world_objects.get_node(marker) as EntitySpawner
+		await get_tree().physics_frame
+		var first_x := spawner.global_position.x - 48.0
+		camera.position.x += first_x - 1.0 - area.get_enemy_group_origin_x()
+		spawner.update_activity(area.get_enemy_spawn_region(), area.get_activity_region(true), area.theme)
+		assert(spawner.get_child_count() == 1, marker)
+		camera.position.x += 1.0
+		spawner.update_activity(area.get_enemy_spawn_region(), area.get_activity_region(true), area.theme)
+		var space := area.get_world_2d().direct_space_state
+		var count := 0
+		for child in spawner.get_children():
+			if not child is BaseEnemy:
+				continue
+			assert(child.global_position.x == first_x + count * 24.0, marker)
+			var collider := child.get_node("Body/CollisionShape2D") as CollisionShape2D
+			var shape := PhysicsShapeQueryParameters2D.new()
+			shape.shape = collider.shape
+			shape.collision_mask = 1
+			shape.transform = collider.global_transform.translated(Vector2(0, -0.1))
+			assert(space.intersect_shape(shape).is_empty(), marker + " spawned inside terrain")
+			var feet := collider.global_position + Vector2(0, collider.shape.get_rect().end.y)
+			var floor_probe := PhysicsRayQueryParameters2D.create(
+				feet - Vector2(0, 0.1), feet + Vector2(0, 0.1), 1
+			)
+			assert(not space.intersect_ray(floor_probe).is_empty(), marker + " spawned over a pit")
+			count += 1
+		assert(count == groups[marker], marker)
+		level.shutdown()
+		level.queue_free()
+		await get_tree().process_frame

@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://cgxilwrkd7fx5" path="res://assets/palettes/castle/tileset/Palette 4 (Coins and Interactibles).png" id="coin"]
 [ext_resource type="Texture2D" uid="uid://cre2hc0wsvd7k" path="res://assets/tileset/castle/previews/flagpole.png" id="flagpole"]
 [ext_resource type="Texture2D" uid="uid://dwygpw8s4jkf" path="res://assets/tileset/castle/previews/sideways_pipe_entrance.png" id="side"]
+[ext_resource type="Texture2D" uid="uid://d4jgkxv3ypbwr" path="res://assets/tileset/castle/previews/springboard.png" id="springboard_art"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_brick"]
 resource_name = "Brick entity"
@@ -52,6 +53,14 @@ margins = Vector2i(48, 0)
 2:1/0/custom_data_0 = "castle_part"
 3:1/0 = 0
 3:1/0/custom_data_0 = "castle_part"
+
+[sub_resource type="TileSetAtlasSource" id="springboard"]
+resource_name = "Springboard"
+texture = ExtResource("springboard_art")
+0:0/size_in_atlas = Vector2i(1, 2)
+0:0/0 = 0
+0:0/0/texture_origin = Vector2i(0, -8)
+0:0/0/custom_data_0 = "springboard"
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_alternate"]
 resource_name = "Alternate brick entity"
@@ -121,3 +130,4 @@ sources/9 = SubResource("hidden_question")
 sources/12 = SubResource("reward_brick")
 sources/13 = SubResource("reward_brick_alternate")
 sources/15 = SubResource("castle_parts")
+sources/16 = SubResource("springboard")

@@ -80,6 +80,7 @@ func _ready() -> void:
 	await ticks()
 	assert(level.area_transport.has_active_state())
 	assert(player.arrival_control_ticks_remaining == 17)
+	assert(level.area_transport.enemy_spawns_held)
 	var hidden_position := player.body.global_position
 	assert(GameHandler.request_pause_toggle())
 	await ticks(20)
@@ -92,6 +93,12 @@ func _ready() -> void:
 		assert(player.body.global_position == hidden_position)
 		assert(player.arrival_control_ticks_remaining == 16 - i)
 	assert(level.area_transport.has_active_state())
+	assert(level.area_transport.advance() and level.area_transport.enemy_spawns_held)
+	await step()
+	assert(player.body.global_position.y < hidden_position.y)
+	assert(level.area_transport.advance() and level.area_transport.enemy_spawns_held)
+	await get_tree().process_frame
+	assert(not level.area_transport.enemy_spawns_held)
 	for i in range(180):
 		assert(player.arrival_control_ticks_remaining == 0)
 		await step()
@@ -108,6 +115,7 @@ func _ready() -> void:
 	assert(level.area_transport.has_active_state() and player.arrival_control_ticks_remaining == 17)
 	level.area_transport.cancel(true)
 	assert(not level.area_transport.pending and player.arrival_control_ticks_remaining == 0)
+	assert(not level.area_transport.enemy_spawns_held)
 	assert(player.can_read_controller_input())
 	# Death restart constructs a fresh player with ordinary immediate controls.
 	var old_player := player

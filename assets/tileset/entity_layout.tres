@@ -7,6 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://ck8w2kxc4e3gx" path="res://assets/tileset/previews/flagpole.png" id="flagpole"]
 [ext_resource type="Texture2D" uid="uid://b4hv8mt44te7g" path="res://assets/tileset/previews/large_castle.png" id="large_castle"]
 [ext_resource type="Texture2D" uid="uid://b87hu6kqi013q" path="res://assets/tileset/previews/sideways_pipe_entrance.png" id="side"]
+[ext_resource type="Texture2D" uid="uid://b3ksrgtohqume" path="res://assets/tileset/previews/springboard.png" id="springboard_art"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_brick"]
 resource_name = "Brick entity"
@@ -36,9 +37,9 @@ margins = Vector2i(32, 0)
 0:0/0/custom_data_0 = "reward_brick_alternate"
 
 [sub_resource type="TileSetAtlasSource" id="large_castle"]
-resource_name = "Large Castle (9x11)"
+resource_name = "Large Castle (5x11)"
 texture = ExtResource("large_castle")
-0:0/size_in_atlas = Vector2i(9, 11)
+0:0/size_in_atlas = Vector2i(5, 11)
 0:0/0 = 0
 0:0/0/texture_origin = Vector2i(-32, -80)
 0:0/0/custom_data_0 = "large_castle"
@@ -61,6 +62,14 @@ margins = Vector2i(48, 0)
 2:1/0/custom_data_0 = "castle_part"
 3:1/0 = 0
 3:1/0/custom_data_0 = "castle_part"
+
+[sub_resource type="TileSetAtlasSource" id="springboard"]
+resource_name = "Springboard"
+texture = ExtResource("springboard_art")
+0:0/size_in_atlas = Vector2i(1, 2)
+0:0/0 = 0
+0:0/0/texture_origin = Vector2i(0, -8)
+0:0/0/custom_data_0 = "springboard"
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_alternate"]
 resource_name = "Alternate brick entity"
@@ -131,3 +140,4 @@ sources/12 = SubResource("reward_brick")
 sources/13 = SubResource("reward_brick_alternate")
 sources/14 = SubResource("large_castle")
 sources/15 = SubResource("castle_parts")
+sources/16 = SubResource("springboard")

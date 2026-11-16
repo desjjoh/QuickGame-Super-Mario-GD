@@ -8,4 +8,5 @@ script = ExtResource("script")
 persist_progress = false
 
 [node name="Presentation" type="Node2D" parent="."]
+position = Vector2(0, 1)
 physics_interpolation_mode = 2

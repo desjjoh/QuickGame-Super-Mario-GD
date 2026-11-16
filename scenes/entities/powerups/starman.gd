@@ -3,20 +3,17 @@ extends PowerUp
 
 const DELAYED_REWARD := preload("res://scenes/components/interactions/delayed_reward.gd")
 const RISING_REWARD_POPUP := preload("res://scenes/components/presentation/rising_reward_popup.gd")
-const TERRAIN_PROBE := preload("res://scenes/components/interactions/terrain_probe.gd")
-const BOUNCE_SPEED := -180.0
+const BOUNCING_MOVEMENT := preload("res://scenes/components/motion/bouncing_movement.gd")
 const TRAVEL_SPEED := 60.0
 
-var _direction := 1.0
-var _probe := PhysicsPointQueryParameters2D.new()
+var _bounce: BOUNCING_MOVEMENT
 
 @onready var _motion: MotionValues = $Motion
-@onready var _vertical: VerticalMovementComponent = $Motion/VerticalMovement
 
 
 func _ready() -> void:
 	super()
-	_probe.collision_mask = _motion.body.collision_mask
+	_bounce = BOUNCING_MOVEMENT.new(_motion, $Motion/VerticalMovement, TRAVEL_SPEED, 1.0)
 	$Presentation/PaletteAnimation.set_enabled(true)
 
 
@@ -25,27 +22,11 @@ func _emergence_clearance() -> float:
 
 
 func _advance_available(delta: float) -> void:
-	var body := _motion.body
 	var player := _level.player if is_instance_valid(_level) else null
-	_probe.exclude = [player.body.get_rid()] if is_instance_valid(player) else []
-	body.velocity.x = TRAVEL_SPEED * _direction
-	var next_speed := _vertical.prepare_step(_motion, delta)
-	body.global_position += body.velocity * delta
-	_vertical.finish_step(_motion, next_speed)
-	# The reference compares the low byte of speed plus two before checking support.
-	var can_bounce := ((_vertical.integer_speed + 2) & 0xff) >= 3
-	if can_bounce and _solid_at(body.global_position + Vector2(0, 8)):
-		# Land at the same tile-relative height as the jumping-enemy routine.
-		body.global_position.y = floorf(body.global_position.y / 16.0) * 16.0 + 8.0
-		body.velocity.y = BOUNCE_SPEED
-	if _solid_at(body.global_position + Vector2(8 * _direction, 4)):
-		_direction = -_direction
-		body.velocity.x = TRAVEL_SPEED * _direction
-
-
-func _solid_at(point: Vector2) -> bool:
-	_probe.position = point + Vector2(0.01, 0.01)
-	return TERRAIN_PROBE.hits_terrain(self, _probe)
+	var excluded_bodies: Array[RID] = []
+	if is_instance_valid(player):
+		excluded_bodies.append(player.body.get_rid())
+	_bounce.advance(self, delta, excluded_bodies)
 
 
 func _grant_reward(player: BasePlayer) -> void:

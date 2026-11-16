@@ -34,7 +34,7 @@ func _ready() -> void:
 		assert(level.spawn_registry.get_slot(&"enemy", bar) == -1)
 		var segments := bar.get_node("Presentation").get_children()
 		assert(segments.size() == (6 if bar == short else 12))
-		assert((segments.front() as Sprite2D).global_position == bar.get_parent().global_position)
+		assert((segments.front() as Sprite2D).global_position == bar.get_parent().global_position + Vector2.DOWN)
 		var half_width := _view().size.x / 2.0
 		var pivot_x := bar.global_position.x + FireBar.PIVOT.x
 		_scroll(pivot_x - half_width + 16.0)

@@ -4,6 +4,7 @@ extends Node
 
 var input_locked: bool = false
 var pending: bool = false
+var enemy_spawns_held := false
 var _transport_state: PlayerTransportState = null
 var _transport_trip: Dictionary = {}
 var _transport_exiting: bool = false
@@ -24,6 +25,12 @@ func advance() -> bool:
 			or level.player.state_machine.current_state != _transport_state
 		):
 			cancel(true)
+		elif (
+			enemy_spawns_held
+			and (_transport_state as PlayerPipeEnterState).has_started_emergence()
+		):
+			# Open the spawn gate after the first emergence tick has finished.
+			_release_enemy_spawns.call_deferred(_transport_phase)
 		return true
 	if (
 		ControllerHandler.input_down <= 0.5
@@ -33,6 +40,11 @@ func advance() -> bool:
 	):
 		input_locked = false
 	return false
+
+
+func _release_enemy_spawns(phase: int) -> void:
+	if phase == _transport_phase:
+		enemy_spawns_held = false
 
 
 func _resolve_area(id: StringName) -> BaseLevelArea:
@@ -357,6 +369,11 @@ func _arrive_at_destination(under_cover: bool) -> void:
 		_transport_state.commit_transfer()
 	_disconnect_transport_state()
 	input_locked = true
+	enemy_spawns_held = (
+		arrival_state is PlayerPipeEnterState
+		and arrival["direction"] == Vector2.UP
+	)
+	arrival["skip_passed_enemies"] = enemy_spawns_held and not was_loaded
 	if not level._commit_area_arrival(area, trip["target_id"], arrival, under_cover):
 		cancel(false)
 		return
@@ -389,6 +406,7 @@ func _disconnect_transport_state() -> void:
 	_transport_completion_callback = Callable()
 	_transport_trip.clear()
 	_transport_exiting = false
+	enemy_spawns_held = false
 
 
 func cancel(resume_player: bool) -> void:

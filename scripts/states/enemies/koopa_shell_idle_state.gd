@@ -16,7 +16,7 @@ func enter() -> void:
 	enemy.sprite.flip_v = enemy.get("shell_upside_down")
 	enemy.sprite.vframes = 2
 	enemy.sprite.frame = 4
-	enemy.sprite.position = Vector2(0, 2)
+	enemy.sprite.position = Vector2(0, 1 if enemy.sprite.flip_v else 3)
 	if enemy.sprite.position != previous_offset:
 		enemy.sprite.reset_physics_interpolation()
 
@@ -36,7 +36,7 @@ func process_physics(delta: float) -> BaseState:
 		enemy.sprite.flip_v = false
 		enemy.sprite.frame = 0
 		enemy.sprite.vframes = 1
-		enemy.sprite.position = Vector2(0, -8)
+		enemy.sprite.position = Vector2(0, -7)
 		return walking
 	if wake_ticks_remaining <= WARNING_TICKS:
 		entity.sprite.frame = 9 if GameHandler.animation_clock.tick_count & 8 == 0 else 4

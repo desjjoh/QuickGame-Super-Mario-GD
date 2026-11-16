@@ -111,6 +111,10 @@ func enter() -> void:
 			player.animation_player.advance(0.0)
 
 
+func has_started_emergence() -> bool:
+	return _emerging and _elapsed > 0.0
+
+
 func _speed() -> float:
 	return 30.0 if _direction.x != 0.0 else maxf(entry_speed, 1.0)
 

@@ -7,10 +7,22 @@ const CASTLE_PART := &"castle_part"
 @onready var level: BaseLevel = $"../.."
 
 
-func populate(area: BaseLevelArea, saved_entities: Dictionary, enemy_cutoff_x := -INF) -> void:
+func populate(area: BaseLevelArea, saved_entities: Dictionary) -> void:
 	area.entity_persistence.clear()
 	populate_layout(area, area.get_node("Layouts/EntityLayout"), saved_entities)
-	populate_layout(area, area.get_node("Layouts/EnemyLayout"), {}, enemy_cutoff_x)
+	populate_layout(area, area.get_node("Layouts/EnemyLayout"), {})
+
+
+func skip_enemy_spawns_before(area: BaseLevelArea, right_edge: float) -> void:
+	var layout := area.get_node("Layouts/EnemyLayout") as TileMapLayer
+	for cell in layout.get_used_cells():
+		var data := layout.get_cell_tile_data(cell)
+		if data == null:
+			continue
+		var entity_id := StringName(str(data.get_custom_data("entity_id")))
+		var spawner := find_layout_entity(area, entity_id, cell) as EntitySpawner
+		if spawner != null:
+			spawner.skip_spawn_before(right_edge)
 
 
 func find_layout_entity(area: BaseLevelArea, entity_id: StringName, cell: Vector2i) -> BaseEntity:
@@ -19,7 +31,7 @@ func find_layout_entity(area: BaseLevelArea, entity_id: StringName, cell: Vector
 
 
 func populate_layout(
-	area: BaseLevelArea, layout: TileMapLayer, saved_entities: Dictionary, enemy_cutoff_x := -INF
+	area: BaseLevelArea, layout: TileMapLayer, saved_entities: Dictionary
 ) -> void:
 	var objects := area.get_node("WorldObjects") as Node2D
 	# Hide authoring stamps. Copy scenery cells into the runtime world.
@@ -60,8 +72,6 @@ func populate_layout(
 		var local_origin := layout.map_to_local(cell) - Vector2(layout.tile_set.tile_size) / 2.0
 		entity.position = objects.to_local(layout.to_global(local_origin))
 		objects.add_child(entity)
-		if enemy_cutoff_x != -INF and entity is EntitySpawner:
-			entity.skip_spawn_before(enemy_cutoff_x)
 		if level.ending_presentation != null:
 			level.ending_presentation.bind_entity(entity, cell, area)
 

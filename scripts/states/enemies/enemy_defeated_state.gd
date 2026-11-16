@@ -4,6 +4,7 @@ extends EntityState
 @export var duration := 0.5
 @export var launch_speed := 0.0
 @export var horizontal_speed := 0.0
+@export var defeat_sprite_y_offset := 0.0
 
 var launch_direction := 1.0
 var fireball_launch := false
@@ -40,6 +41,7 @@ func enter() -> void:
 
 func _apply_launch_pose() -> void:
 	entity.sprite.flip_v = launch_speed != 0.0
+	entity.sprite.position.y += defeat_sprite_y_offset
 
 
 func process_physics(delta: float) -> BaseState:

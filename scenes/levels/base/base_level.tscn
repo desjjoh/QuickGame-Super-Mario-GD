@@ -2,6 +2,7 @@
 
 [ext_resource type="PackedScene" path="res://scenes/entities/spawners/green_koopa_spawner.tscn" id="green_koopa"]
 [ext_resource type="PackedScene" path="res://scenes/entities/spawners/green_koopa_pair_spawner.tscn" id="green_koopa_pair"]
+[ext_resource type="PackedScene" path="res://scenes/entities/spawners/green_parakoopa_spawner.tscn" id="green_parakoopa"]
 [ext_resource type="PackedScene" path="res://scenes/entities/spawners/red_koopa_spawner.tscn" id="red_koopa"]
 [ext_resource type="PackedScene" path="res://scenes/entities/spawners/red_parakoopa_spawner.tscn" id="red_parakoopa"]
 
@@ -17,6 +18,7 @@
 [ext_resource type="AudioStream" path="res://assets/audio/music/death.wav" id="death_sound"]
 
 [ext_resource type="PackedScene" path="res://scenes/entities/climbables/flagpole/flagpole.tscn" id="flagpole"]
+[ext_resource type="PackedScene" path="res://scenes/entities/platforms/springboard.tscn" id="springboard"]
 
 [ext_resource type="Script" path="res://scenes/levels/base/level_death.gd" id="level_death"]
 
@@ -55,11 +57,13 @@ entity_scenes = Dictionary[StringName, PackedScene]({
 &"castle": ExtResource("entity_castle"),
 &"coin": ExtResource("coin"),
 &"flagpole": ExtResource("flagpole"),
+&"springboard": ExtResource("springboard"),
 &"goomba_pair_spawner": ExtResource("goomba_pair"),
 &"goomba_spawner": ExtResource("goomba"),
 &"goomba_triplet_spawner": ExtResource("goomba_triplet"),
 &"green_koopa_pair_spawner": ExtResource("green_koopa_pair"),
 &"green_koopa_spawner": ExtResource("green_koopa"),
+&"green_parakoopa_spawner": ExtResource("green_parakoopa"),
 &"hidden_question_block": ExtResource("hidden_question"),
 &"large_castle": ExtResource("entity_large_castle"),
 &"one_up_spawner": ExtResource("one_up"),

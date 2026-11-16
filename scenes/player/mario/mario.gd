@@ -204,19 +204,20 @@ func get_head_position() -> Vector2:
 	return super.get_head_position()
 
 
-func move_body(gravity_after_motion: bool = false) -> void:
+func move_body(gravity_after_motion: bool = false) -> bool:
 	var before := body.global_position
 	var rising := body.velocity.y < 0.0
-	super.move_body(gravity_after_motion)
+	var ceiling_handled := super.move_body(gravity_after_motion)
 	if form_controller.current_form.can_crouch and not is_dead:
 		var before_correction_x := body.global_position.x
-		terrain.resolve(self, before, rising, form_controller.is_crouched)
+		terrain.resolve(self, before, rising and not ceiling_handled, form_controller.is_crouched)
 		camera_correction_x += body.global_position.x - before_correction_x
 	terrain.collect_coins(
 		self, not form_controller.current_form.can_crouch or form_controller.is_crouched
 	)
 	if _uses_floor_probes():
 		_floor_position = body.global_position
+	return ceiling_handled
 
 
 func has_floor_support() -> bool:
