@@ -14,6 +14,8 @@
 layer = 0
 script = ExtResource("1_script")
 stages = Array[PackedScene]([ExtResource("2_level"), ExtResource("3_level"), ExtResource("4_level"), ExtResource("5_kjrfb"), ExtResource("6_se30j")])
+start_stage_override = ExtResource("6_se30j")
+start_with_title = false
 enemy_limit = 10
 save_entity_state_through_death = false
 shadow_style = ExtResource("3_gf1f2")

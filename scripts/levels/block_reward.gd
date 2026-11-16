@@ -2,7 +2,7 @@ class_name BlockReward
 extends Resource
 ## Shared authoring data; live countdown state belongs to each block.
 
-enum Kind { COIN, TIMED_COINS, POWER_UP, TIERED_POWER_UP }
+enum Kind { COIN, TIMED_COINS, POWER_UP, TIERED_POWER_UP, VINE }
 const SUPER_MUSHROOM_PATH := "res://scenes/entities/powerups/super_mushroom.tscn"
 const FIRE_FLOWER_PATH := "res://scenes/entities/powerups/fire_flower.tscn"
 @export var kind: Kind = Kind.COIN

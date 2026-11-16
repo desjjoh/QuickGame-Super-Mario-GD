@@ -33,6 +33,7 @@ const PULSE_CUE_CORRECTIONS_DB := {
 	&"pipe": -11.90,
 	&"power_up_grab": -11.88,
 	&"power_up_reveal": -12.98,
+	&"vine_grow": -12.98,
 	&"stomp": -12.59,
 	&"timer_tick": -11.78,
 }
@@ -124,6 +125,17 @@ func _register_square_two_cues() -> void:
 		PEAK_SAMPLE,
 		[0x1ab, 0x11d, 0x10d, 0x193, 0x10d, 0xfe, 0x17c, 0xfe, 0xef, 0x167, 0xef, 0xe2],
 		[3, 2, 2, 4, 2, 2, 4, 2, 2, 4, 2, 2],
+		0.5
+	)
+	# The vine uses the full 63-tick reveal table.
+	_sounds[&"vine_grow"] = WAVEFORMS.pulse(
+		PEAK_SAMPLE,
+		[
+			0x1ab, 0x11d, 0x10d, 0x193, 0x10d, 0xfe, 0x17c, 0xfe,
+			0xef, 0x167, 0xef, 0xe2, 0x153, 0xe2, 0xd5, 0x140,
+			0xd5, 0xc9, 0x12e, 0xc9, 0xbe, 0x11d, 0xbe, 0xb3
+		],
+		[3, 2, 2, 4, 2, 2, 4, 2, 2, 4, 2, 2, 4, 2, 2, 4, 2, 2, 4, 2, 2, 4, 2, 2],
 		0.5
 	)
 	# Square 2 control $98 selects a 50% duty cycle and constant volume 8.

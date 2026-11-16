@@ -153,6 +153,28 @@ func step(player: BasePlayer, axis: Vector2, delta: float, vertical_step: float 
 	return true
 
 
+func try_step_off_bottom(player: BasePlayer, direction: float, distance: float) -> bool:
+	var surface := get_surface()
+	var horizontal := signf(direction)
+	if (
+		not is_instance_valid(surface)
+		or not surface.is_available()
+		or horizontal != _side
+		or _side_ticks > 1
+		or horizontal == _consumed_horizontal
+	):
+		return false
+	var feet := player.body.global_position
+	if absf(feet.y - surface.climb_bottom.global_position.y) > player.body.safe_margin:
+		return false
+	var offset := Vector2(_side * distance, 0.0)
+	if player.body.test_move(player.body.global_transform, offset):
+		return false
+	player.body.global_position = feet + offset
+	player.face_direction(_side)
+	return true
+
+
 func place_on_side(player: BasePlayer, side: float) -> void:
 	var surface := get_surface()
 	if not is_instance_valid(surface):

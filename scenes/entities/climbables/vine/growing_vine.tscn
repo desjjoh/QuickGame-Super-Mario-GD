@@ -1,0 +1,22 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/entities/climbables/base/base_climbable.tscn" id="base"]
+[ext_resource type="Script" path="res://scenes/entities/climbables/vine/growing_vine.gd" id="vine"]
+
+[sub_resource type="RectangleShape2D" id="detection"]
+size = Vector2(32, 112)
+
+[node name="GrowingVine" instance=ExtResource("base")]
+script = ExtResource("vine")
+persist_progress = false
+texture_filter = 1
+
+[node name="ClimbTop" parent="Anchors" index="0"]
+position = Vector2(8, 0)
+
+[node name="ClimbBottom" parent="Anchors" index="1"]
+position = Vector2(8, 0)
+
+[node name="CollisionShape2D" parent="Interactions/Detection" index="0"]
+position = Vector2(8, -48)
+shape = SubResource("detection")

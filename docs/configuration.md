@@ -114,6 +114,10 @@ On a single lift, leave **Travel Distance** at −1 to use the original oscillat
 
 The 2D editor draws a cyan travel line and surfaces at the selected width. Single lifts show the travel span and starting surface. Repeating lanes show the full cycle and the starting surfaces from **Initial Offsets**.
 
+## Configure a vine reward
+
+Paint a **Reward Brick** on **EntityLayout** and select **Apply Vine Reward** in the Block Rewards brush, then click the painted brick. The editor previews the vine tip in the area palette. In 2-1 the vine reward is at (83, 5). It starts drawing at 8 px of growth and first becomes climbable at 32 px.
+
 ## Paint springboards
 
 Paint **Springboard** on **EntityLayout**. The painted cell is the top of the uncompressed spring. In 2-1 it is at (188, 11), before the wall at columns 190–191. Jump onto it and press Jump again during compression for the high bounce.
