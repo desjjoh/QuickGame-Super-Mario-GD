@@ -1,21 +1,23 @@
 extends Node
 
-enum Track { OVERWORLD, UNDERGROUND, NONE, CASTLE, COIN_HEAVEN }
+enum Track { OVERWORLD, UNDERGROUND, NONE, CASTLE, COIN_HEAVEN, UNDERWATER }
 enum Pace { NORMAL, FAST, WARNING }
 
-const STARMAN_TRACK := Track.COIN_HEAVEN + 1
+const STARMAN_TRACK := Track.UNDERWATER + 1
 const PIPE_OPENING_CUE := preload("res://assets/audio/music/pipe_opening.wav")
 const CASTLE_CLEAR_CUE := preload("res://assets/audio/music/castle_clear.wav")
 const STREAMS = {
 	Track.OVERWORLD: preload("res://assets/audio/music/overworld.wav"),
 	Track.UNDERGROUND: preload("res://assets/audio/music/underground.wav"),
 	Track.CASTLE: preload("res://assets/audio/music/castle.wav"),
+	Track.UNDERWATER: preload("res://assets/audio/music/underwater.wav"),
 	STARMAN_TRACK: preload("res://assets/audio/music/starman.wav"),
 }
 const FAST_STREAMS = {
 	Track.OVERWORLD: preload("res://assets/audio/music/overworld_fast.wav"),
 	Track.UNDERGROUND: preload("res://assets/audio/music/underground_fast.wav"),
 	Track.CASTLE: preload("res://assets/audio/music/castle_fast.wav"),
+	Track.UNDERWATER: preload("res://assets/audio/music/underwater_fast.wav"),
 	STARMAN_TRACK: preload("res://assets/audio/music/starman_fast.wav"),
 }
 const FAST_OVERWORLD_SECTIONS := preload("res://assets/audio/music/overworld_fast_sections.tres")

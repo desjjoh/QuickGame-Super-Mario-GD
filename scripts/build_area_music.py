@@ -6,6 +6,7 @@ import wave
 from build_music_tracks import (
     CLEAR_LENGTHS,
     CPU_HZ,
+    HURRY_PULSE_CONTROLS,
     NORMAL_LENGTHS,
     PULSE_PEAK,
     SAMPLE_RATE,
@@ -92,6 +93,26 @@ UNDERGROUND = (
     "83 1a 18 16 84 14 1a 18 0e 0c 16 83 14 20 1e 1c 28 26 "
     "87 24 1a 12 10 62 0e 80 04 04"
 )
+# Water's music header starts at 0x08 and hurry adds 0x08.
+UNDERWATER_LENGTHS = {
+    "": (4, 8, 16, 32, 64, 24, 48, 12),
+    "_fast": (3, 6, 12, 24, 48, 18, 36, 8),
+}
+UNDERWATER = (
+    "82 18 1c 20 22 26 28 81 2a 2a 2a 04 2a 04 83 2a 82 22 86 34 32 34 81 04 "
+    "22 26 2a 2c 30 86 34 83 32 82 36 84 34 85 04 81 22 86 30 2e 30 81 04 22 "
+    "26 2a 2c 2e 86 30 83 22 82 36 84 34 85 04 81 22 86 3a 3a 3a 82 3a 81 40 "
+    "82 04 81 3a 86 36 36 36 82 36 81 3a 82 04 81 36 86 34 82 26 2a 36 81 34 "
+    "34 85 34 81 2a 86 2c",
+    "98 96 94 92 94 96 58 58 58 44 5c 44 9f a3 a1 a3 85 a3 e0 a6 23 c4 9f 9d "
+    "9f 85 9f d2 a6 23 c4 b5 b1 af 85 b1 af ad 85 95 9e a2 aa 6a 6a 6b 5e 9d",
+    "84 04 04 82 22 86 22 82 14 22 2c 12 22 2a 14 22 2c 1c 22 2c 14 22 2c 12 "
+    "22 2a 14 22 2c 1c 22 2c 18 22 2a 16 20 28 18 22 2a 12 22 2a 18 22 2a 12 "
+    "22 2a 14 22 2c 0c 22 2c 14 22 34 12 22 30 10 22 2e 16 22 34 18 26 36 16 "
+    "26 36 14 26 36 12 22 36 5c 22 34 0c 22 22 81 1e 1e 85 1e 81 12 86 14",
+    "84 90 b0 84 50 50 b0",
+)
+
 # Castle uses note-length table offsets 0x00 and 0x08 for normal and hurry.
 CASTLE_LENGTHS = {
     "": (5, 10, 20, 40, 80, 30, 60, 2),
@@ -147,13 +168,14 @@ def render_noise(pattern, count, lengths=NORMAL_LENGTHS):
 
 
 def render_section(
-    melody, harmony, bass, beats="", lengths=NORMAL_LENGTHS, *, sustain_long_triangle=False,
+    melody, harmony, bass, beats="", lengths=NORMAL_LENGTHS, *,
+    sustain_long_triangle=False, pulse_controls=(),
 ):
     notes = list(decode(melody, lengths))
     count = sum(frames for _, frames in notes) * SAMPLES_PER_FRAME
     voices = (
-        render(notes, count, area=True),
-        render(decode(harmony, lengths, packed=True), count, area=True),
+        render(notes, count, area=True, controls=pulse_controls),
+        render(decode(harmony, lengths, packed=True), count, area=True, controls=pulse_controls),
         render(
             decode(bass, lengths), count, triangle=True, area=True,
             sustain_long_triangle=sustain_long_triangle,
@@ -169,6 +191,8 @@ AREA_LEVEL_CORRECTIONS_DB = {
     "overworld_fast": -8.68,
     "underground": -5.62,
     "underground_fast": -5.57,
+    "underwater": -9.57,
+    "underwater_fast": -9.47,
     "castle": -7.0,
     "castle_fast": -7.04,
     "starman": -7.35,
@@ -192,6 +216,12 @@ def write_area_tracks(folder, suffix, area_lengths, star_lengths):
     tracks = {
         "overworld": ground_sections,
         "underground": (render_section(UNDERGROUND, "", UNDERGROUND, lengths=area_lengths),),
+        "underwater": (
+            render_section(
+                *UNDERWATER, lengths=UNDERWATER_LENGTHS[suffix],
+                sustain_long_triangle=True, pulse_controls=HURRY_PULSE_CONTROLS,
+            ),
+        ),
         "castle": (
             render_section(*CASTLE, lengths=CASTLE_LENGTHS[suffix], sustain_long_triangle=True),
         ),

@@ -22,6 +22,8 @@ func _ready() -> void:
 		var tempo := 2.0 if track == MusicHandler.STARMAN_TRACK else 1.5
 		if track == MusicHandler.Track.CASTLE:
 			tempo = 1.25
+		elif track == MusicHandler.Track.UNDERWATER:
+			tempo = 4.0 / 3.0
 		assert(fast.mix_rate == regular.mix_rate)
 		assert(absf(fast.get_length() * tempo - regular.get_length()) < 0.01)
 

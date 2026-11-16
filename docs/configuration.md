@@ -17,7 +17,7 @@ Use Godot’s **Project → Project Settings → Input Map** to inspect bindings
 
 Select a `BaseLevelArea` and set its **Theme** to Overworld, Underground, Castle, or Underwater. The theme supplies compatible ground, decoration, and entity TileSets, plus entity and UI artwork. Keep source IDs and atlas coordinates compatible across themes so painted layouts survive a theme change.
 
-Set **Background Music** independently to Overworld, Underground, Castle, Coin Heaven, or None. Overworld is the default. 1-1 uses Underground in its secret area.
+Set **Background Music** independently to Overworld, Underground, Castle, Coin Heaven, Underwater, or None. Overworld is the default. 1-1 uses Underground in its secret area.
 
 Set **Transport Points** and **Pipe Routes** on the source area to link placed pipes to explicit area and destination IDs. A destination pipe supplies its exit pose. The reserved `player_spawn` target returns to the main area’s spawn. Standalone arrival markers are useful where an area needs a separate landing point.
 
@@ -49,7 +49,7 @@ Open `scenes/main/game.tscn`, select **Game**, and assign **Presentation → Tit
 
 - Set **Area Left** and **Area Right** on the area camera to define the playable scroll range. A one-screen area starting at its origin uses 0 and 256, wherever it sits in the level scene.
 - Set the timer limit and enable flag on the level. The HUD keeps the TIME label and hides the digits on the start screen, during transitions such as level intro, TIME UP, and GAME OVER, and whenever the timer is disabled.
-- Set **Background Music** on the area to choose Overworld, Underground, Castle, Coin Heaven, or None. 1-4 selects Castle. The 2-1 cloud area selects Coin Heaven, which uses the Starman theme and its hurry-up loop.
+- Set **Background Music** on the area to choose Overworld, Underground, Castle, Coin Heaven, Underwater, or None. 1-4 selects Castle. The 2-2 main area selects Underwater. The 2-1 cloud area selects Coin Heaven, which uses the Starman theme and its hurry-up loop.
 - Hurry-up plays once when the timer falls from 100 to 99. A timed stage authored at 1–99 plays the warning at gameplay reveal and then uses the fast music. Starting below 100 is a deliberate extension for authored stages.
 - In `scenes/main/game.tscn`, select **Game → Gameplay → Save Entity State Through Death**. Enabled by default, it carries saved entity state and runtime tile changes into the next attempt. Disable it to reload the stage's authored state after a death. Each entity's persistence setting still controls what is saved between area visits. Score and coins in the HUD carry forward in either mode, and death still costs a life.
 - The Game scene supplies the stage list and the shared shadow master toggle. The first stage is 1-1. Open `scenes/main/game.tscn`, select **Game**, and use **Presentation → Shadow Style** to load `assets/shadows/soft.tres`, `crisp.tres`, or `outer_blur.tres`. Clear the field for no shadow effect. Outer Blur is the current authored Game selection. One selection applies to the title and every stage; standalone F6 previews read the saved Game selection and master toggle. Decorations remain outside the effect.
