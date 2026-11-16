@@ -1,7 +1,7 @@
-[gd_resource type="TileSet" format=3]
+[gd_resource type="TileSet" format=3 uid="uid://gd85bqv464i5"]
 
-[ext_resource type="Texture2D" path="res://assets/palettes/underwater/enemies/goomba.png" id="goomba"]
-[ext_resource type="Texture2D" path="res://assets/palettes/underwater/enemies/koopa.png" id="koopa"]
+[ext_resource type="Texture2D" uid="uid://dftdon2srae6b" path="res://assets/palettes/underwater/enemies/goomba.png" id="goomba"]
+[ext_resource type="Texture2D" uid="uid://2y0g3s4gkd36" path="res://assets/palettes/underwater/enemies/koopa.png" id="koopa"]
 [ext_resource type="Texture2D" uid="uid://c236w6qqt7obc" path="res://assets/enemies/red-koopa.png" id="red_koopa_art"]
 
 [sub_resource type="TileSetAtlasSource" id="single"]

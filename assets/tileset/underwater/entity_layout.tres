@@ -1,13 +1,13 @@
-[gd_resource type="TileSet" format=3]
+[gd_resource type="TileSet" format=3 uid="uid://lovpm1s554gc"]
 
-[ext_resource type="Texture2D" path="res://assets/palettes/underwater/tileset/Palette 1 (Ground and Stone).png" id="3_alternate"]
-[ext_resource type="Texture2D" path="res://assets/tileset/underwater/previews/pipe_entrance.png" id="4_pipe"]
-[ext_resource type="Texture2D" path="res://assets/tileset/underwater/previews/castle.png" id="castle"]
-[ext_resource type="Texture2D" path="res://assets/palettes/underwater/tileset/Palette 4 (Coins and Interactibles).png" id="coin"]
-[ext_resource type="Texture2D" path="res://assets/tileset/underwater/previews/flagpole.png" id="flagpole"]
-[ext_resource type="Texture2D" path="res://assets/tileset/underwater/previews/large_castle.png" id="large_castle"]
-[ext_resource type="Texture2D" path="res://assets/tileset/underwater/previews/sideways_pipe_entrance.png" id="side"]
-[ext_resource type="Texture2D" path="res://assets/tileset/underwater/previews/springboard.png" id="springboard_art"]
+[ext_resource type="Texture2D" uid="uid://d2ol8ojjjavty" path="res://assets/palettes/underwater/tileset/Palette 1 (Ground and Stone).png" id="3_alternate"]
+[ext_resource type="Texture2D" uid="uid://cywrx7yvc1x3x" path="res://assets/tileset/underwater/previews/pipe_entrance.png" id="4_pipe"]
+[ext_resource type="Texture2D" uid="uid://lrpt65k6mjq8" path="res://assets/tileset/underwater/previews/castle.png" id="castle"]
+[ext_resource type="Texture2D" uid="uid://17tjt0yg72ai" path="res://assets/palettes/underwater/tileset/Palette 4 (Coins and Interactibles).png" id="coin"]
+[ext_resource type="Texture2D" uid="uid://sqdskedey7sm" path="res://assets/tileset/underwater/previews/flagpole.png" id="flagpole"]
+[ext_resource type="Texture2D" uid="uid://bkldurdxs14a8" path="res://assets/tileset/underwater/previews/large_castle.png" id="large_castle"]
+[ext_resource type="Texture2D" uid="uid://bgj75tcwg27kk" path="res://assets/tileset/underwater/previews/sideways_pipe_entrance.png" id="side"]
+[ext_resource type="Texture2D" uid="uid://dyxa4bl37dhev" path="res://assets/tileset/underwater/previews/springboard.png" id="springboard_art"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_brick"]
 resource_name = "Brick entity"
