@@ -19,6 +19,8 @@ Select a `BaseLevelArea` and set its **Theme** to Overworld, Underground, Castle
 
 Set **Background Music** independently to Overworld, Underground, Castle, Coin Heaven, Underwater, or None. Overworld is the default. 1-1 uses Underground in its secret area.
 
+Under **Movement**, enable **Swimming Enabled** to use swim movement and bubbles. 2-2 enables it in MainArea. The player enters Swim after the arrival lock and resumes land movement after emerging in SurfaceArea.
+
 Set **Transport Points** and **Pipe Routes** on the source area to link placed pipes to explicit area and destination IDs. A destination pipe supplies its exit pose. The reserved `player_spawn` target returns to the main area’s spawn. Standalone arrival markers are useful where an area needs a separate landing point.
 
 Configure **Presentations → PipeOpening** with the intro area, painted castle cell, and the sideways pipe's **Entrance ID**. A fresh entry spawns at the castle doorway and walks into that pipe automatically. In 1-2, the pipe targets `main / arrival`, which uses **Areas → MainArea → Arrival**. Early deaths restart at **Players → PlayerSpawn**. Move each marker to set its placement independently.

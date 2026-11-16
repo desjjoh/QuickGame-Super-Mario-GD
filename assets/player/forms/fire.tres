@@ -33,6 +33,36 @@ atlas = ExtResource("sheet")
 region = Rect2(80, 0, 16, 32)
 filter_clip = true
 
+[sub_resource type="AtlasTexture" id="swim0"]
+atlas = ExtResource("sheet")
+region = Rect2(144, 0, 16, 32)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="swim1"]
+atlas = ExtResource("sheet")
+region = Rect2(160, 0, 16, 32)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="swim2"]
+atlas = ExtResource("sheet")
+region = Rect2(176, 0, 16, 32)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="swim3"]
+atlas = ExtResource("sheet")
+region = Rect2(192, 0, 16, 32)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="swim4"]
+atlas = ExtResource("sheet")
+region = Rect2(208, 0, 16, 32)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="swim5"]
+atlas = ExtResource("sheet")
+region = Rect2(224, 0, 16, 32)
+filter_clip = true
+
 [sub_resource type="AtlasTexture" id="walk0"]
 atlas = ExtResource("sheet")
 region = Rect2(16, 0, 16, 32)
@@ -55,6 +85,7 @@ idle = SubResource("idle")
 walk = Array[Texture2D]([SubResource("walk0"), SubResource("walk1"), SubResource("walk2")])
 skid = SubResource("slide")
 jump = SubResource("jump")
+swim = Array[Texture2D]([SubResource("swim0"), SubResource("swim1"), SubResource("swim2"), SubResource("swim3"), SubResource("swim4"), SubResource("swim5")])
 crouch = SubResource("crouch")
 climb = Array[Texture2D]([SubResource("climb0"), SubResource("climb1")])
 jump_cue = &"jump_big"

@@ -180,6 +180,7 @@ func check_burst_frame(shot: Fireball, impact: Vector2, tick: int) -> void:
 	assert(shot.burst_tick == tick)
 	assert(shot.global_position == impact)
 	assert(shot.sprite.visible and shot.sprite.frame == ((tick - 1) >> 1))
+	assert(shot.sprite.z_index < BaseLevel.containing(shot).players.z_index)
 	assert(rect.size == Vector2(16, 16))
 	assert(shot.sprite.to_global(rect.position) == impact + Vector2(-4, -3))
 
@@ -503,6 +504,7 @@ func check_throw_pose(luigi: bool, speed: float, air: bool, duration: int, skid 
 			var expected_y := floorf(feet.y) - 28.0 if air else 180.0
 			assert(shot.global_position == Vector2(expected_x, expected_y))
 			assert(not shot.sprite.z_as_relative and shot.sprite.z_index == DRAW_ORDER.FIREBALL)
+			assert(shot.sprite.z_index < level.players.z_index)
 		assert(pose.visible == (tick < duration), "Throw duration at tick %s" % tick)
 		if pose.visible:
 			var walking := not air and not skid and speed > 0.0

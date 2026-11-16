@@ -17,7 +17,7 @@ func configure(player: BasePlayer, form: MarioForm) -> void:
 	if _library_template == null:
 		_library_template = animation.get_animation_library(&"")
 		_death_texture = machine.get_node("Dead").sprite_texture
-		for state_name in ["Idle", "Move", "Slide", "Jump", "PipeEnter", "Climb", "Dead"]:
+		for state_name in ["Idle", "Move", "Slide", "Jump", "PipeEnter", "Climb", "Dead", "Swim"]:
 			(machine.get_node(state_name) as BaseState).entered.connect(_apply_pose_offset)
 	current_form = form
 	_player.jump_action.sound_cue = form.jump_cue
@@ -30,6 +30,7 @@ func configure(player: BasePlayer, form: MarioForm) -> void:
 		"Move": form.walk[0],
 		"Slide": form.skid,
 		"Jump": form.jump,
+		"Swim": form.swim[0] if not form.swim.is_empty() else form.jump,
 		"PipeEnter": form.idle,
 		"Climb": form.climb[0],
 		"Dead": _death_texture
@@ -105,7 +106,9 @@ func refresh_posture_art() -> void:
 	if state == null:
 		return
 	var crouch_pose := is_crouched and state.name in [&"Idle", &"Move", &"Jump", &"PipeEnter"]
-	if state.name == &"Move" and not _player.has_floor_support():
+	if state.name == &"Swim":
+		crouch_pose = is_crouched and _player.has_floor_support()
+	elif state.name == &"Move" and not _player.has_floor_support():
 		crouch_pose = false
 	if crouch_pose:
 		_player.animation_player.pause()

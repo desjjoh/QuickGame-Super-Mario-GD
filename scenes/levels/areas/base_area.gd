@@ -46,6 +46,11 @@ var _transport_cells: Dictionary[Vector2i, StringName] = {}
 			apply_theme()
 			area_theme_changed.emit(theme)
 
+@export_group("Movement")
+## Selects swimming movement and bubbles independently of the visual theme.
+@export var swimming_enabled := false
+
+
 
 func _ready() -> void:
 	set_process(Engine.is_editor_hint())
@@ -61,6 +66,19 @@ func enter_area() -> void:
 	is_active = true
 	set_physics_process(true)
 	update_camera_activity()
+	if swimming_enabled:
+		_start_swim_bubbles()
+
+
+func _start_swim_bubbles() -> void:
+	var level := BaseLevel.containing(self)
+	if level == null or not level.player is Mario or $WorldObjects.has_node("SwimBubbles"):
+		return
+	var bubbles := SwimBubbleEmitter.new()
+	bubbles.name = "SwimBubbles"
+	bubbles.player = level.player
+	bubbles.area = self
+	$WorldObjects.add_child(bubbles)
 
 
 func exit_area() -> void:

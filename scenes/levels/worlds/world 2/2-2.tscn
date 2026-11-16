@@ -59,6 +59,7 @@ player_scene = ExtResource("player")
 process_physics_priority = 110
 position = Vector2(160, 240)
 background_color = Color(0.5803922, 0.5803922, 1, 1)
+swimming_enabled = true
 background_music = 5
 transport_points = Array[ExtResource("transport_placement")]([SubResource("SurfaceEntrance")])
 theme = ExtResource("underwater")

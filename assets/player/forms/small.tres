@@ -16,11 +16,37 @@ atlas = ExtResource("swim")
 region = Rect2(112, 0, 16, 16)
 filter_clip = true
 
+[sub_resource type="AtlasTexture" id="swim0"]
+atlas = ExtResource("swim")
+region = Rect2(112, 0, 16, 16)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="swim1"]
+atlas = ExtResource("swim")
+region = Rect2(128, 0, 16, 16)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="swim2"]
+atlas = ExtResource("swim")
+region = Rect2(144, 0, 16, 16)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="swim3"]
+atlas = ExtResource("swim")
+region = Rect2(160, 0, 16, 16)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="swim4"]
+atlas = ExtResource("swim")
+region = Rect2(176, 0, 16, 16)
+filter_clip = true
+
 [resource]
 script = ExtResource("script")
 idle = ExtResource("idle")
 walk = Array[Texture2D]([ExtResource("walk0"), ExtResource("walk1"), ExtResource("walk2")])
 skid = ExtResource("skid")
 jump = ExtResource("jump")
+swim = Array[Texture2D]([SubResource("swim0"), SubResource("swim1"), SubResource("swim2"), SubResource("swim3"), SubResource("swim4"), SubResource("swim4")])
 climb = Array[Texture2D]([ExtResource("climb0"), ExtResource("climb1")])
 shrink_pose = SubResource("shrink")

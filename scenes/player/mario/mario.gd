@@ -105,6 +105,8 @@ func _ready() -> void:
 		form = fire_form
 	form_controller.configure(self, form)
 	super._ready()
+	if _area_uses_swimming():
+		state_machine.change_state(state_machine.get_state(&"Swim"))
 	if gameplay_spawn:
 		if form == fire_form:
 			GameHandler.set_player_form(PlayerStatus.PowerupForm.FIRE)
@@ -126,10 +128,27 @@ func update_scripted_walk_animation() -> void:
 @onready var terrain: MarioTerrain = $Motion/MarioTerrain
 
 
+func _area_uses_swimming() -> bool:
+	var level := BaseLevel.containing(self)
+	return level != null and level.active_area != null and level.active_area.swimming_enabled
+
+
 func _physics_process(delta: float) -> void:
 	if form_presentation.blocks_actor_motion():
 		_throw_pose.clear()
 		return
+	var locomotion := state_machine.current_state
+	if (
+		(locomotion is MarioIdleState or locomotion is MarioMoveState
+		or locomotion is MarioJumpState or locomotion is MarioSlideState)
+		and not scripted_motion_step.is_valid()
+		and _area_uses_swimming()
+	):
+		if arrival_control_ticks_remaining > 0:
+			# Leave the player at Arrival while the shared lock counts down.
+			_advance_arrival_control_lock()
+			return
+		state_machine.change_state(state_machine.get_state(&"Swim"))
 	walk_animation.tick()
 	var grounded := has_floor_support()
 	var previous_speed := body.velocity.x
@@ -265,6 +284,7 @@ func _uses_floor_probes() -> bool:
 		or state is MarioMoveState
 		or state is MarioSlideState
 		or state is MarioJumpState
+		or state is MarioSwimState
 	)
 
 
