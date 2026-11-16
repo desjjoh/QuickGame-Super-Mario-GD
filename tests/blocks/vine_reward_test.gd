@@ -78,14 +78,15 @@ func _ready() -> void:
 	var castle_vine := preload("res://assets/themes/castle.tres").resolve_texture(VINE.ART)
 	assert(castle_vine.resource_path == "res://assets/palettes/castle/misc/vine.png")
 	restored.free()
-	for form in [player.small_form, player.super_form]:
+	for form in [player.small_form, player.super_form, player.fire_form]:
 		player.form_controller.configure(player, form)
 		for side in [-1.0, 1.0]:
+			assert(await _check_walk_in_and_release(player, vine, side))
 			assert(await _check_step_off(player, vine, side))
 	level.shutdown()
 	level.queue_free()
 	await get_tree().process_frame
-	print("PASS: Mesen vine reveal, climb threshold, neutral grab, four vine step-offs, and progress restoration.")
+	print("PASS: Mesen vine reveal, climb threshold, neutral grab, grounded walk-in and midair/ground exits from both sides with all three forms, and progress restoration.")
 	await preload("res://tests/fixtures/finish_test.gd").finish(get_tree())
 
 
@@ -122,4 +123,53 @@ func _check_step_off(player: Mario, vine: GrowingVine, side: float) -> bool:
 	assert(player.climbing.get_surface() == null)
 	assert((player.body.global_position.x - start.x) * side > 4.0)
 	assert(absf(player.body.global_position.y - bottom.y) <= player.body.safe_margin)
+	return true
+
+
+func _check_walk_in_and_release(player: Mario, vine: GrowingVine, side: float) -> bool:
+	var move := player.climb_state.move_state
+	var bottom := vine.climb_bottom.global_position
+	player.state_machine.change_state(move)
+	player.body.global_position = bottom + Vector2(side * 30.0, 0.0)
+	player.body.velocity = Vector2.ZERO
+	player.vertical_movement.reset_fraction(player.body)
+	player.set_physics_process(true)
+	for tick in range(8):
+		await stepped
+	assert(player.has_floor_support())
+	var inward := "ui_right" if side < 0.0 else "ui_left"
+	Input.action_press(inward)
+	for tick in range(50):
+		await stepped
+		if player.climbing.get_surface() == vine:
+			break
+	Input.action_release(inward)
+	assert(player.climbing.get_surface() == vine)
+	assert(is_equal_approx(player.body.global_position.y, bottom.y))
+
+	var climb_frames := player.form_controller.current_form.climb
+	var saw_second_pose := false
+	Input.action_press("ui_up")
+	for tick in range(16):
+		await stepped
+		if player.sprite.texture == climb_frames[1]:
+			saw_second_pose = true
+	Input.action_release("ui_up")
+	assert(saw_second_pose, "Held Up must reach the second climb pose.")
+	await stepped
+	assert(player.sprite.texture == climb_frames[0])
+	var before := player.body.global_position
+	assert(absf(before.y - (bottom.y - 14.0)) <= player.body.safe_margin, str(before))
+
+	var outward := "ui_left" if side < 0.0 else "ui_right"
+	Input.action_press(outward)
+	await stepped
+	Input.action_release(outward)
+	assert(player.climbing.get_surface() == null)
+	assert(player.state_machine.current_state == move)
+	assert(player.body.global_position.is_equal_approx(before + Vector2(side * 4.0, 0.0)))
+	for tick in range(8):
+		await stepped
+	assert(player.climbing.get_surface() == null)
+	assert(player.body.global_position.y > before.y)
 	return true

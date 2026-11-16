@@ -236,7 +236,7 @@ func can_contact_lift() -> bool:
 func is_riding_horizontal_lift() -> bool:
 	return (
 		is_instance_valid(_lift_support)
-		and _lift_support.motion == MovingLift.Motion.HORIZONTAL
+		and _lift_support.motion in [MovingLift.Motion.HORIZONTAL, MovingLift.Motion.RIGHT_ON_LANDING]
 		and _lift_support.supports(self)
 	)
 

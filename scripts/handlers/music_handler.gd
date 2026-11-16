@@ -1,9 +1,9 @@
 extends Node
 
-enum Track { OVERWORLD, UNDERGROUND, NONE, CASTLE }
+enum Track { OVERWORLD, UNDERGROUND, NONE, CASTLE, COIN_HEAVEN }
 enum Pace { NORMAL, FAST, WARNING }
 
-const STARMAN_TRACK := Track.CASTLE + 1
+const STARMAN_TRACK := Track.COIN_HEAVEN + 1
 const PIPE_OPENING_CUE := preload("res://assets/audio/music/pipe_opening.wav")
 const CASTLE_CLEAR_CUE := preload("res://assets/audio/music/castle_clear.wav")
 const STREAMS = {
@@ -115,7 +115,9 @@ func end_starman(level: Node) -> void:
 
 
 func _requested_loop() -> AudioStreamWAV:
-	return (_fast_loops if _fast else _loops).get(_requested_track)
+	# Coin Heaven shares the theme with the temporary Starman override.
+	var track := STARMAN_TRACK if _requested_track == Track.COIN_HEAVEN else _requested_track
+	return (_fast_loops if _fast else _loops).get(track)
 
 
 func _next_fast_overworld_section() -> float:

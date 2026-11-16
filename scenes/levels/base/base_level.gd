@@ -451,7 +451,7 @@ func _commit_area_arrival(
 		area_content.skip_enemy_spawns_before(area, area.get_enemy_group_origin_x())
 	var previous_area := active_area
 	active_area = area
-	player.begin_arrival_control_lock()
+	player.begin_arrival_control_lock(arrival.get("control_lock_ticks", BasePlayer.ARRIVAL_CONTROL_TICKS))
 	if leaving_opening:
 		MusicHandler.stop_area(self)
 		opening_presentation.cancel()
@@ -540,8 +540,15 @@ func _check_fall_death() -> void:
 		camera.global_position.y if camera is LevelCamera else camera.get_screen_center_position().y
 	)
 	var bottom := center_y + get_viewport_rect().size.y / camera.zoom.y / 2.0
-	if player.death_envelope_top() > bottom + fall_death_margin:
-		on_death(player, false)
+	if player.death_envelope_top() <= bottom + fall_death_margin:
+		return
+	if (
+		is_instance_valid(active_area)
+		and active_area.fall_destination != null
+		and area_transport.begin(player, active_area.fall_destination, null, false)
+	):
+		return
+	on_death(player, false)
 
 
 func on_complete(

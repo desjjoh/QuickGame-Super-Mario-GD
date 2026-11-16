@@ -31,8 +31,7 @@ func attachment_fraction(player: BasePlayer, _from_feet: Vector2, to_feet: Vecto
 		return -1.0
 	# HandleClimbing accepts the NES player's X low nibble $06..$09.
 	# With our +8px body origin, these are two bands relative to the shaft.
-	var offset := to_feet.x - climb_top.global_position.x
-	if not ((offset >= -10.0 and offset < -6.0) or (offset >= 6.0 and offset < 10.0)):
+	if not has_nes_side_alignment(to_feet.x):
 		return -1.0
 	for height in player.get_side_probe_heights():
 		var probe_y := to_feet.y + height

@@ -134,10 +134,10 @@ func _advance_arrival_control_lock() -> void:
 
 
 ## AreaTransport arms this at placement, before any exit presentation advances.
-func begin_arrival_control_lock() -> void:
+func begin_arrival_control_lock(ticks: int = ARRIVAL_CONTROL_TICKS) -> void:
 	if is_shutdown or is_dead:
 		return
-	arrival_control_ticks_remaining = ARRIVAL_CONTROL_TICKS
+	arrival_control_ticks_remaining = ticks
 	_sync_controller_input()
 
 

@@ -10,6 +10,7 @@ const TILE_SIZE := 16
 
 var growth := 0
 var _last_growth_step := -1
+var _growth_tick_origin := 0
 var _art: Texture2D
 
 
@@ -27,13 +28,15 @@ func set_activity_suspended(suspended: bool) -> void:
 		set_physics_process(growth < FULL_HEIGHT)
 
 
-func start_growth() -> void:
+func start_growth(align_growth_to_spawn: bool = false) -> void:
+	if align_growth_to_spawn:
+		_growth_tick_origin = GameHandler.animation_clock.tick_count
 	SoundHandler.play_reward(&"vine_grow")
-	_grow(GameHandler.animation_clock.tick_count)
+	_grow(GameHandler.animation_clock.tick_count - _growth_tick_origin)
 
 
 func _physics_process(_delta: float) -> void:
-	_grow(GameHandler.animation_clock.tick_count)
+	_grow(GameHandler.animation_clock.tick_count - _growth_tick_origin)
 
 
 func _grow(tick: int) -> void:
@@ -56,23 +59,27 @@ func is_available() -> bool:
 	return growth >= CLIMB_HEIGHT and super()
 
 
-func attachment_fraction(player: BasePlayer, from_feet: Vector2, to_feet: Vector2) -> float:
+func requires_live_contact() -> bool:
+	return true
+
+
+func attachment_y(feet_y: float) -> float:
+	return feet_y
+
+
+func attachment_fraction(player: BasePlayer, _from_feet: Vector2, to_feet: Vector2) -> float:
 	if not is_available() or player.is_dead or player.is_shutdown:
 		return -1.0
-	# The NES publishes climbable cells as its growing tip enters them.
-	var first_row := global_position.y + floorf((4.0 - growth) / TILE_SIZE) * TILE_SIZE
-	var last_row := global_position.y - TILE_SIZE
-	var center := climb_top.global_position.x
-	var low := Vector2(center - attachment_tolerance, first_row)
-	var high := Vector2(center + attachment_tolerance - 0.001, last_row - 0.001)
-	var earliest := INF
+	if not has_nes_side_alignment(to_feet.x):
+		return -1.0
+	# The NES stamps a climbable tile using the tip position plus 16 pixels.
+	var bottom := global_position.y
+	var top := bottom + floorf((TILE_SIZE - growth) / float(TILE_SIZE)) * TILE_SIZE
 	for height in player.get_side_probe_heights():
-		for side in [-6.0, 5.0]:
-			var offset := Vector2(side, height)
-			var fraction := _sweep_fraction(from_feet + offset, to_feet + offset, low, high)
-			if fraction >= 0.0:
-				earliest = minf(earliest, fraction)
-	return earliest if is_finite(earliest) else -1.0
+		var probe_y := roundf(to_feet.y) + height
+		if probe_y >= top and probe_y < bottom:
+			return 1.0
+	return -1.0
 
 
 func _draw() -> void:

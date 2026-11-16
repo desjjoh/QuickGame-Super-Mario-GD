@@ -32,6 +32,8 @@ var actors_suspended := false
 @export var area_id: StringName
 @export var background_music: MusicHandler.Track = MusicHandler.Track.OVERWORLD
 @export var transport_points: Array[TransportPlacement] = []
+## Route a fall below this area to an endpoint in the same level.
+@export var fall_destination: TransportDestination
 @export var question_block_rewards: Dictionary[Vector2i, Resource] = {}
 @export var pipe_spawns: Dictionary[Vector2i, Resource] = {}
 var _transport_cells: Dictionary[Vector2i, StringName] = {}

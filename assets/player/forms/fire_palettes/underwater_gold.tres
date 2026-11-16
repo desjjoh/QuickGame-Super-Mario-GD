@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="PlayerPalette" format=3]
+
+[ext_resource type="Script" path="res://scripts/player/player_palette.gd" id="script"]
+[ext_resource type="Texture2D" path="res://assets/player/mario + luigi (starman small)/palette 8.png" id="small_sheet"]
+[ext_resource type="Texture2D" path="res://assets/player/mario + luigi (starman)/palette 8.png" id="super_sheet"]
+
+[resource]
+script = ExtResource("script")
+small_sheet = ExtResource("small_sheet")
+super_sheet = ExtResource("super_sheet")
+starman_colors = Array[Color]([Color(0.67843137, 0.67843137, 0.67843137, 1), Color(1, 1, 1, 1), Color(0.9019608, 0.6117647, 0.12941176, 1)])

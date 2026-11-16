@@ -54,7 +54,7 @@ func _ready() -> void:
 	)
 	assert(castle.title_accent_font != null)
 	assert(castle.terrain.get_source_count() == 3)
-	assert(castle.decorations.get_source_count() == 4)
+	assert(castle.decorations.get_source_count() == 7)
 	for source_id in [3, 4, 5, 6]:
 		var marker := castle.entity_markers.get_source(source_id) as TileSetAtlasSource
 		assert(marker.texture.resource_path.contains("/castle/"))
@@ -146,7 +146,7 @@ func _ready() -> void:
 			"/palettes/underground/"
 		)
 	)
-	assert(main_terrain.get_source_count() == 4 and lower_ground.tile_set.get_source_count() == 3)
+	assert(main_terrain.get_source_count() == 5 and lower_ground.tile_set.get_source_count() == 3)
 	assert(main_terrain.has_source(2) and not lower_ground.tile_set.has_source(2))
 	for source_id in [0, 1]:
 		var original := main_terrain.get_source(source_id) as TileSetAtlasSource
@@ -166,7 +166,7 @@ func _ready() -> void:
 			and lower_decorations.get_physics_layers_count() == 0
 		)
 	)
-	assert(main_decorations.get_source_count() == 5 and lower_decorations.get_source_count() == 4)
+	assert(main_decorations.get_source_count() == 8 and lower_decorations.get_source_count() == 7)
 	assert(main_decorations.has_source(16) and not lower_decorations.has_source(16))
 	for id in [0, 3, 9, 17]:
 		assert(lower_decorations.has_source(id))
@@ -215,7 +215,7 @@ func _ready() -> void:
 	)
 	assert(main.theme.resolve_texture(original_texture) == original_texture)
 	# Every supplied counterpart is mapped, including all question animation frames.
-	assert(lower.theme.texture_overrides.size() == 30)
+	assert(lower.theme.texture_overrides.size() == 31)
 	for source_path: String in lower.theme.texture_overrides:
 		var replacement := lower.theme.resolve_texture(load(source_path))
 		assert(

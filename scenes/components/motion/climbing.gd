@@ -64,7 +64,7 @@ func find_surface(
 			continue
 		if _blocked_surface != null and _blocked_surface.get_ref() == surface:
 			continue
-		if not after_motion and surface is FlagpoleEntity:
+		if not after_motion and (surface is FlagpoleEntity or surface.requires_live_contact()):
 			continue
 		var fraction := surface.attachment_fraction(player, from_feet, to_feet)
 		if fraction >= 0.0 and fraction < first:
@@ -101,13 +101,15 @@ func notify_attached(player: BasePlayer) -> void:
 		surface.notify_attached(player)
 
 
-func detach(player: BasePlayer) -> void:
+func detach(player: BasePlayer, lost_contact: bool = false) -> void:
 	var surface := get_surface()
 	_surface = null
-	player.body.velocity = Vector2.ZERO
+	if not lost_contact:
+		player.body.velocity = Vector2.ZERO
 	if is_instance_valid(surface):
-		# Do not immediately re-grab after stepping off the bottom.
-		_blocked_surface = weakref(surface)
+		# Explicit detach requires clearance, while lost contact can be regained next tick.
+		if not lost_contact:
+			_blocked_surface = weakref(surface)
 		surface.notify_detached(player)
 
 
@@ -115,6 +117,9 @@ func step(player: BasePlayer, axis: Vector2, delta: float, vertical_step: float 
 	var surface := get_surface()
 	if not is_instance_valid(surface) or not surface.is_available():
 		return false
+	if surface.requires_live_contact():
+		_step_with_live_contact(player, axis, delta, vertical_step)
+		return true
 	_side_ticks = maxi(0, _side_ticks - 1)
 	var horizontal := signf(axis.x)
 	var switched := false
@@ -153,26 +158,32 @@ func step(player: BasePlayer, axis: Vector2, delta: float, vertical_step: float 
 	return true
 
 
-func try_step_off_bottom(player: BasePlayer, direction: float, distance: float) -> bool:
-	var surface := get_surface()
-	var horizontal := signf(direction)
-	if (
-		not is_instance_valid(surface)
-		or not surface.is_available()
-		or horizontal != _side
-		or _side_ticks > 1
-		or horizontal == _consumed_horizontal
-	):
-		return false
-	var feet := player.body.global_position
-	if absf(feet.y - surface.climb_bottom.global_position.y) > player.body.safe_margin:
-		return false
-	var offset := Vector2(_side * distance, 0.0)
-	if player.body.test_move(player.body.global_transform, offset):
-		return false
-	player.body.global_position = feet + offset
-	player.face_direction(_side)
-	return true
+func _step_with_live_contact(
+	player: BasePlayer, axis: Vector2, delta: float, vertical_step: float
+) -> void:
+	const OUTWARD_STEP := 4.0
+	var speed := (-upward_speed if axis.y < 0.0 else downward_speed) if axis.y != 0.0 else 0.0
+	var displacement := vertical_step
+	if is_nan(displacement):
+		displacement = player.vertical_movement.consume_displacement(roundi(speed * delta * 256.0))
+	player.body.velocity = Vector2(0.0, displacement / delta)
+	player.body.move_and_slide()
+	player.body.velocity.y = 0.0 if player.body.is_on_floor() or player.body.is_on_ceiling() else speed
+
+	_side_ticks = maxi(0, _side_ticks - 1)
+	var direction := signf(axis.x)
+	if is_zero_approx(direction):
+		_side_ticks = 0
+	elif _side_ticks == 0:
+		var stepping_off := direction == _side
+		var distance := OUTWARD_STEP if stepping_off else 2.0 * side_offset
+		var offset := Vector2(direction * distance, 0.0)
+		if not player.body.test_move(player.body.global_transform, offset):
+			player.body.global_position += offset
+			_side = direction
+			player.face_direction(direction if stepping_off else -direction)
+			player.body.reset_physics_interpolation()
+		_side_ticks = side_switch_frames
 
 
 func place_on_side(player: BasePlayer, side: float) -> void:

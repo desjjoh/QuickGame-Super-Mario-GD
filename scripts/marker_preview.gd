@@ -1,7 +1,7 @@
 extends RefCounted
 ## Shared offline preview rendering; scenes never enter the live tree.
 
-const THEME_NAMES := ["overworld", "underground", "castle"]
+const THEME_NAMES := ["overworld", "underground", "castle", "underwater"]
 
 
 static func output_path(theme_name: String, marker: String) -> String:

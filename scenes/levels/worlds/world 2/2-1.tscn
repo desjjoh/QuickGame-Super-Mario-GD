@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" path="res://scenes/entities/powerups/one_up_mushroom.tscn" id="4_5fcc5"]
 [ext_resource type="PackedScene" path="res://scenes/levels/areas/base_area.tscn" id="area"]
 [ext_resource type="PackedScene" uid="uid://wlp13xllihs5" path="res://scenes/levels/base/base_level.tscn" id="base"]
+[ext_resource type="Script" uid="uid://cpgbqm8kbgk2k" path="res://scripts/levels/coin_heaven_arrival.gd" id="cloud_arrival"]
 [ext_resource type="PackedScene" path="res://scenes/levels/endings/flagpole_ending.tscn" id="ending"]
 [ext_resource type="Resource" uid="uid://c3foo08jvqc33" path="res://assets/pipe_spawns/green_piranha_plant.tres" id="green_plant"]
 [ext_resource type="PackedScene" path="res://scenes/entities/powerups/super_mushroom.tscn" id="mushroom"]
@@ -20,6 +21,15 @@
 [ext_resource type="TileSet" uid="uid://b5swkgewllff0" path="res://assets/tileset/underground/enemy_layout.tres" id="underground_enemy_layout"]
 [ext_resource type="TileSet" uid="uid://cs6ppr1ph7fpm" path="res://assets/tileset/underground/entity_layout.tres" id="underground_entity_layout"]
 [ext_resource type="TileSet" uid="uid://g7pmg7w6xn86" path="res://assets/tileset/underground/terrain.tres" id="underground_terrain"]
+
+[ext_resource type="Script" path="res://scenes/levels/areas/area_endpoint.gd" id="area_endpoint"]
+
+[ext_resource type="PackedScene" path="res://scenes/entities/spawners/single_lift_spawner.tscn" id="single_lift"]
+
+[sub_resource type="Resource" id="CoinHeavenReturn"]
+script = ExtResource("pipe_destination")
+area_id = &"main"
+target_id = &"coin_heaven_return"
 
 [sub_resource type="Resource" id="pipe_46"]
 script = ExtResource("pipe_placement")
@@ -145,7 +155,7 @@ tile_map_data = PackedByteArray("AAAAAA0AAAAAAAAAAAAAAA4AAAAAAAAAAAABAA0AAAAAAAA
 tile_set = ExtResource("overworld_terrain")
 
 [node name="EntityLayout" parent="Areas/MainArea/Layouts" parent_id_path=PackedInt32Array(250103957, 1417906807) index="2" unique_id=257943121]
-tile_map_data = PackedByteArray("AAAAAAIADgAAAAAAAAAFAAcADwABAAAAAAAFAAgADwABAAEAAAAFAAkADwABAAEAAAAFAAoADwABAAEAAAAFAAsADwABAAEAAAAFAAwADwABAAEAAAAGAAcADwABAAAAAAAGAAgADwABAAEAAAAGAAkADwABAAEAAAAGAAoADwABAAEAAAAGAAsADwABAAEAAAAGAAwADwABAAEAAAAPAAkAAAAAAAAAAAAQAAkADAAAAAAAAAARAAkAAAAAAAAAAAAcAAUACQAAAAAAAAAcAAkACQAAAAAAAAAdAAUAAAAAAAAAAAAeAAUAAAAAAAAAAAAfAAUAAAAAAAAAAAAuAAkAAwAAAAAAAAA1AAUAAQAAAAAAAAA1AAkAAQAAAAAAAAA2AAUAAQAAAAAAAAA2AAkAAQAAAAAAAAA3AAUAAQAAAAAAAAA3AAkAAQAAAAAAAAA4AAUAAQAAAAAAAAA4AAkAAQAAAAAAAAA5AAUAAQAAAAAAAAA5AAkAAQAAAAAAAABEAAkAAAAAAAAAAABFAAUADAAAAAAAAABGAAUAAAAAAAAAAABHAAUAAAAAAAAAAABIAAUAAAAAAAAAAABKAAkAAwAAAAAAAABPAAkAAQAAAAAAAABQAAkAAQAAAAAAAABRAAUAAAAAAAAAAABRAAkAAQAAAAAAAABSAAUAAAAAAAAAAABSAAkAAQAAAAAAAABTAAUADAAAAAAAAABUAAUAAAAAAAAAAABVAAUAAAAAAAAAAABVAAkAAQAAAAAAAABWAAkAAQAAAAAAAABXAAkAAQAAAAAAAABcAAUAAAAAAAAAAABdAAUAAAAAAAAAAABeAAUAAAAAAAAAAABfAAUAAAAAAAAAAABnAAkAAwAAAAAAAABzAAsAAwAAAAAAAAB6AAkAAwAAAAAAAAB9AAUADAAAAAAAAAB+AAUAAAAAAAAAAAB+AAoAAwAAAAAAAAB/AAUAAAAAAAAAAACAAAUAAAAAAAAAAACCAAgAAwAAAAAAAAChAAkADAAAAAAAAACkAAUAAAAAAAAAAAClAAUAAAAAAAAAAACmAAUAAAAAAAAAAACnAAUAAAAAAAAAAACoAAUAAAAAAAAAAACqAAkAAQAAAAAAAACsAAUADAAAAAAAAACwAAoAAwAAAAAAAAC5AAkAAAAAAAAAAAC6AAUACQAAAAAAAAC6AAkAAAAAAAAAAADIAAIABQAAAAAAAADMAAgABgAAAAAAAAC8AAsAEAAAAAAAAAA=")
+tile_map_data = PackedByteArray("AAAAAAIADgAAAAAAAAAFAAcADwABAAAAAAAFAAgADwABAAEAAAAFAAkADwABAAEAAAAFAAoADwABAAEAAAAFAAsADwABAAEAAAAFAAwADwABAAEAAAAGAAcADwABAAAAAAAGAAgADwABAAEAAAAGAAkADwABAAEAAAAGAAoADwABAAEAAAAGAAsADwABAAEAAAAGAAwADwABAAEAAAAPAAkAAAAAAAAAAAAQAAkADAAAAAAAAAARAAkAAAAAAAAAAAAcAAUACQAAAAAAAAAcAAkACQAAAAAAAAAdAAUAAAAAAAAAAAAeAAUAAAAAAAAAAAAfAAUAAAAAAAAAAAAuAAkAAwAAAAAAAAA1AAUAAQAAAAAAAAA1AAkAAQAAAAAAAAA2AAUAAQAAAAAAAAA2AAkAAQAAAAAAAAA3AAUAAQAAAAAAAAA3AAkAAQAAAAAAAAA4AAUAAQAAAAAAAAA4AAkAAQAAAAAAAAA5AAUAAQAAAAAAAAA5AAkAAQAAAAAAAABEAAkAAAAAAAAAAABFAAUADAAAAAAAAABGAAUAAAAAAAAAAABHAAUAAAAAAAAAAABIAAUAAAAAAAAAAABKAAkAAwAAAAAAAABPAAkAAQAAAAAAAABQAAkAAQAAAAAAAABRAAUAAAAAAAAAAABRAAkAAQAAAAAAAABSAAUAAAAAAAAAAABSAAkAAQAAAAAAAABTAAUADAAAAAAAAABUAAUAAAAAAAAAAABVAAUAAAAAAAAAAABVAAkAAQAAAAAAAABWAAkAAQAAAAAAAABXAAkAAQAAAAAAAABcAAUAAAAAAAAAAABdAAUAAAAAAAAAAABeAAUAAAAAAAAAAABfAAUAAAAAAAAAAABnAAkAAwAAAAAAAABzAAsAAwAAAAAAAAB6AAkAAwAAAAAAAAB9AAUADAAAAAAAAAB+AAUAAAAAAAAAAAB+AAoAAwAAAAAAAAB/AAUAAAAAAAAAAACAAAUAAAAAAAAAAACCAAgAAwAAAAAAAAChAAkADAAAAAAAAACkAAUAAAAAAAAAAAClAAUAAAAAAAAAAACmAAUAAAAAAAAAAACnAAUAAAAAAAAAAACoAAUAAAAAAAAAAACqAAkAAQAAAAAAAACsAAUADAAAAAAAAACwAAoAAwAAAAAAAAC5AAkAAAAAAAAAAAC6AAUACQAAAAAAAAC6AAkAAAAAAAAAAADHAAIABQAAAAAAAADMAAgABgAAAAAAAAC8AAsAEAAAAAAAAAA=")
 tile_set = ExtResource("overworld_entity_layout")
 
 [node name="EnemyLayout" parent="Areas/MainArea/Layouts" parent_id_path=PackedInt32Array(250103957, 1417906807) index="3" unique_id=1742010551]
@@ -158,15 +168,25 @@ area_right = 3360.0
 halfway_check_enabled = true
 halfway_camera_left = 1536.0
 
+[node name="CoinHeavenReturn" type="Marker2D" parent="Areas/MainArea/Endpoints"]
+position = Vector2(2608, 32)
+script = ExtResource("area_endpoint")
+endpoint_id = &"coin_heaven_return"
+camera_sprite_x = 40.0
+control_lock_ticks = 26
+skip_passed_enemies = true
+
 [node name="CoinHeaven" parent="Areas" parent_id_path=PackedInt32Array(638828059) index="1" unique_id=833559527 instance=ExtResource("area")]
 process_physics_priority = 110
-position = Vector2(1280, 0)
+position = Vector2(1264, 0)
 background_color = Color(0.580392, 0.580392, 1, 1)
 area_id = &"coin_heaven"
+background_music = 4
+fall_destination = SubResource("CoinHeavenReturn")
 theme = ExtResource("overworld")
 
 [node name="Background" parent="Areas/CoinHeaven" index="0"]
-offset_right = 1536.0
+offset_right = 1248.0
 offset_bottom = 240.0
 color = Color(0.580392, 0.580392, 1, 1)
 metadata/_edit_use_anchors_ = true
@@ -175,15 +195,24 @@ metadata/_edit_use_anchors_ = true
 tile_set = ExtResource("overworld_decorations")
 
 [node name="GroundLayout" parent="Areas/CoinHeaven/Layouts" parent_id_path=PackedInt32Array(833559527, 1417906807) index="1" unique_id=1683492195]
+tile_map_data = PackedByteArray("AAAAAA0ABAAEAAAAAAABAA0ABAAEAAAAAAACAA0ABAAEAAAAAAADAA0ABAAEAAAAAAAFAA0ABAAEAAAAAAAGAA0ABAAEAAAAAAAHAA0ABAAEAAAAAAAIAA0ABAAEAAAAAAAJAA0ABAAEAAAAAAAKAA0ABAAEAAAAAAALAA0ABAAEAAAAAAAMAA0ABAAEAAAAAAANAA0ABAAEAAAAAAAOAA0ABAAEAAAAAAAPAA0ABAAEAAAAAAAQAA0ABAAEAAAAAAARAA0ABAAEAAAAAAASAA0ABAAEAAAAAAATAA0ABAAEAAAAAAAUAA0ABAAEAAAAAAAVAA0ABAAEAAAAAAAWAA0ABAAEAAAAAAAXAA0ABAAEAAAAAAAYAA0ABAAEAAAAAAAZAA0ABAAEAAAAAAAaAA0ABAAEAAAAAAAbAA0ABAAEAAAAAAAcAA0ABAAEAAAAAAAdAA0ABAAEAAAAAAAeAA0ABAAEAAAAAAAfAA0ABAAEAAAAAAAgAA0ABAAEAAAAAAAhAA0ABAAEAAAAAAAiAA0ABAAEAAAAAAAjAA0ABAAEAAAAAAAkAA0ABAAEAAAAAAAlAA0ABAAEAAAAAAAmAA0ABAAEAAAAAAAnAA0ABAAEAAAAAAAoAA0ABAAEAAAAAAApAA0ABAAEAAAAAAAqAA0ABAAEAAAAAAArAA0ABAAEAAAAAAAsAA0ABAAEAAAAAAAtAA0ABAAEAAAAAAAuAA0ABAAEAAAAAAAvAA0ABAAEAAAAAAAwAA0ABAAEAAAAAAAxAA0ABAAEAAAAAAAyAA0ABAAEAAAAAAAzAA0ABAAEAAAAAAA0AA0ABAAEAAAAAAA1AA0ABAAEAAAAAAA2AA0ABAAEAAAAAAA3AA0ABAAEAAAAAAA4AA0ABAAEAAAAAAA5AA0ABAAEAAAAAAA6AA0ABAAEAAAAAAA7AA0ABAAEAAAAAAA8AA0ABAAEAAAAAAA9AA0ABAAEAAAAAAA=")
 tile_set = ExtResource("overworld_terrain")
 
 [node name="EntityLayout" parent="Areas/CoinHeaven/Layouts" parent_id_path=PackedInt32Array(833559527, 1417906807) index="2" unique_id=257943121]
+tile_map_data = PackedByteArray("AAAPAAYABwAAAAAAAAAQAAYABwAAAAAAAAARAAYABwAAAAAAAAASAAYABwAAAAAAAAATAAYABwAAAAAAAAAUAAYABwAAAAAAAAAVAAYABwAAAAAAAAAWAAYABwAAAAAAAAAXAAYABwAAAAAAAAAYAAYABwAAAAAAAAAZAAYABwAAAAAAAAAaAAYABwAAAAAAAAAbAAYABwAAAAAAAAAcAAYABwAAAAAAAAAdAAYABwAAAAAAAAAeAAYABwAAAAAAAAAgAAQABwAAAAAAAAAhAAQABwAAAAAAAAAiAAQABwAAAAAAAAAkAAUABwAAAAAAAAAlAAUABwAAAAAAAAAmAAUABwAAAAAAAAAnAAUABwAAAAAAAAAoAAUABwAAAAAAAAApAAUABwAAAAAAAAAqAAUABwAAAAAAAAArAAUABwAAAAAAAAAsAAUABwAAAAAAAAAtAAUABwAAAAAAAAAuAAUABwAAAAAAAAAvAAUABwAAAAAAAAAwAAUABwAAAAAAAAAxAAUABwAAAAAAAAAyAAUABwAAAAAAAAAzAAUABwAAAAAAAAA1AAQABwAAAAAAAAA2AAQABwAAAAAAAAA3AAQABwAAAAAAAABFAAwABwAAAAAAAABGAAwABwAAAAAAAABHAAwABwAAAAAAAAA=")
 tile_set = ExtResource("overworld_entity_layout")
+
+[node name="CloudPlatform" parent="Areas/CoinHeaven/WorldObjects" index="0" instance=ExtResource("single_lift")]
+position = Vector2(256, 160)
+axis = 2
+
+[node name="Arrival" parent="Areas/CoinHeaven" index="3" unique_id=1254188347]
+position = Vector2(64, 272)
 
 [node name="Camera2D" parent="Areas/CoinHeaven" index="4" unique_id=254826152]
 position = Vector2(128, 120)
 area_left = 0.0
-area_right = 1536.0
+area_right = 1248.0
 
 [node name="UndergroundSecret" parent="Areas" parent_id_path=PackedInt32Array(638828059) index="2" unique_id=2068344285 instance=ExtResource("area")]
 process_physics_priority = 110
@@ -227,8 +256,15 @@ position = Vector2(48, 448)
 position = Vector2(1584, 448)
 
 [node name="FlagpoleEnding" parent="Presentations" index="0" unique_id=733817188 instance=ExtResource("ending")]
-flagpole_cell = Vector2i(200, 2)
+flagpole_cell = Vector2i(199, 2)
 castle_cell = Vector2i(204, 8)
+
+[node name="CoinHeavenArrival" type="Node" parent="Presentations" index="1" unique_id=2138635827 node_paths=PackedStringArray("source_area", "destination_area", "arrival")]
+script = ExtResource("cloud_arrival")
+source_area = NodePath("../../Areas/MainArea")
+source_cell = Vector2i(83, 5)
+destination_area = NodePath("../../Areas/CoinHeaven")
+arrival = NodePath("../../Areas/CoinHeaven/Arrival")
 
 [editable path="Areas/MainArea"]
 [editable path="Areas/CoinHeaven"]

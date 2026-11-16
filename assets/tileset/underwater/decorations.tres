@@ -1,0 +1,70 @@
+[gd_resource type="TileSet" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/palettes/underwater/tileset/Palette 3 (Pipes and Scenery).png" id="art_1"]
+[ext_resource type="Texture2D" path="res://assets/palettes/underwater/tileset/Palette 2 (Water and Sky).png" id="art_2"]
+[ext_resource type="Texture2D" path="res://assets/palettes/underwater/tileset/Palette 1 (Ground and Stone).png" id="art_3"]
+
+[sub_resource type="TileSetAtlasSource" id="Source_0"]
+resource_name = "Bush parts"
+texture = ExtResource("art_1")
+0:1/0 = 0
+1:1/0 = 0
+2:1/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="tree_trunks"]
+resource_name = "Tree trunks"
+texture = ExtResource("art_3")
+1:1/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="liquid_parts"]
+resource_name = "Water parts"
+texture = ExtResource("art_2")
+3:0/0 = 0
+3:1/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="tree_canopies"]
+resource_name = "Tree canopies"
+texture = ExtResource("art_1")
+5:1/0 = 0
+6:0/0 = 0
+6:1/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="tree_stems"]
+resource_name = "Tree stems"
+texture = ExtResource("art_3")
+1:3/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="fence_parts"]
+resource_name = "Fence parts"
+texture = ExtResource("art_3")
+2:3/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="Source_3"]
+resource_name = "Hill parts"
+texture = ExtResource("art_1")
+2:3/0 = 0
+2:2/0 = 0
+0:3/0 = 0
+4:3/0 = 0
+1:3/0 = 0
+3:3/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="Source_9"]
+resource_name = "Cloud parts"
+texture = ExtResource("art_2")
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+0:1/0 = 0
+1:1/0 = 0
+2:1/0 = 0
+
+[resource]
+sources/0 = SubResource("Source_0")
+sources/3 = SubResource("Source_3")
+sources/9 = SubResource("Source_9")
+sources/16 = SubResource("tree_trunks")
+sources/17 = SubResource("liquid_parts")
+sources/18 = SubResource("tree_canopies")
+sources/19 = SubResource("tree_stems")
+sources/20 = SubResource("fence_parts")
