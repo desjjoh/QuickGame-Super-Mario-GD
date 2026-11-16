@@ -21,6 +21,12 @@ extends Node
 @export_range(1, 99) var starting_lives: int = PlayerStatus.DEFAULT_LIVES + 1
 
 @export_group("Presentation")
+## Fit the 256×240 canvas using whole-number scales, with borders as needed.
+@export var integer_scaling: bool = false:
+	set(value):
+		integer_scaling = value
+		_apply_window_scaling()
+
 ## Optional BaseLevel backdrop for the start menu. Empty uses the first stage.
 @export var title_background: PackedScene
 ## One style for the title, every stage, and standalone level previews.
@@ -37,10 +43,16 @@ extends Node
 		if is_node_ready():
 			$SharedShadow.set_shadow_enabled(value)
 
+var _scale_window: Window
+var _original_scale_stretch: Window.ContentScaleStretch
+
 @onready var level_container: Node2D = $LevelContainer
 
 
 func _ready() -> void:
+	_scale_window = get_window()
+	_original_scale_stretch = _scale_window.content_scale_stretch
+	_apply_window_scaling()
 	$SharedShadow.set_shadow_style(shadow_style)
 	$SharedShadow.set_shadow_enabled(shadow_shader_enabled)
 	$SharedShadow.configure(level_container, $UI)
@@ -56,7 +68,18 @@ func _ready() -> void:
 		push_error("Game startup could not create its initial screen.")
 
 
+func _apply_window_scaling() -> void:
+	if is_instance_valid(_scale_window):
+		_scale_window.content_scale_stretch = (
+			Window.CONTENT_SCALE_STRETCH_INTEGER if integer_scaling
+			else Window.CONTENT_SCALE_STRETCH_FRACTIONAL
+		)
+
+
 func _exit_tree() -> void:
+	if is_instance_valid(_scale_window):
+		_scale_window.content_scale_stretch = _original_scale_stretch
+		_scale_window = null
 	if GameHandler.level_changed.is_connected($SharedShadow.bind_level):
 		GameHandler.level_changed.disconnect($SharedShadow.bind_level)
 	GameHandler.detach_game(self)

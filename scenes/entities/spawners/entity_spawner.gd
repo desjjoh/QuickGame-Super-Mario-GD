@@ -31,7 +31,7 @@ func _ready() -> void:
 
 
 func update_activity(wake_region: Rect2, sleep_region: Rect2, theme: AreaTheme) -> void:
-	if is_shutdown or _attempted or _consumed or not wake_region.has_point(_spawn_trigger()):
+	if is_shutdown or _attempted or _consumed or not wake_region.has_point(global_position):
 		return
 	_attempted = true
 	for offset in actor_offsets:
@@ -40,15 +40,8 @@ func update_activity(wake_region: Rect2, sleep_region: Rect2, theme: AreaTheme) 
 
 
 func skip_spawn_before(right_edge: float) -> void:
-	if _spawn_trigger().x < right_edge:
+	if global_position.x < right_edge:
 		_attempted = true
-
-
-func _spawn_trigger() -> Vector2:
-	var trigger := global_position
-	if spawn_category == &"enemy" and actor_offsets.size() > 1:
-		trigger.x += 48.0
-	return trigger
 
 
 func _spawn_actor(offset: Vector2, sleep_region: Rect2, theme: AreaTheme) -> bool:

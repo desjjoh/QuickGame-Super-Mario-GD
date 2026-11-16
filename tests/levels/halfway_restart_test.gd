@@ -47,12 +47,37 @@ func _ready() -> void:
 
 	assert(is_instance_valid(level) and GameHandler.player_status.lives == 0)
 	await _check_1_2(game)
+	await _check_1_3(game)
 	game.free()
 	await tick_finished
 	print(
-		"PASS: 1-1 and 1-2 halfway thresholds, left limits, repeat deaths, and side-area framing."
+		"PASS: 1-1 through 1-3 halfway thresholds, left limits, repeat deaths, and side-area framing."
 	)
 	await preload("res://tests/fixtures/finish_test.gd").finish(get_tree())
+
+
+func _check_1_3(game: Node) -> void:
+	GameHandler.set_lives(3)
+	assert(GameHandler.load_level(game.stages[2], true, 2, BaseLevel.EntryMode.RESPAWN))
+	var level := await _wait_for_level_start()
+	assert(level.stage_label == "1-3" and _spawn_matches(level, 48.0, 0.0))
+	_set_camera_left(912.0)
+	level.active_area.update_camera_activity()
+	var near_name := "red_parakoopa_spawner_74_4"
+	assert(level.world_objects.get_node(near_name).get_child_count() == 2)
+	_set_camera_left(1023.0)
+	level = await _restart(level, 48.0, 0.0)
+	_set_camera_left(1024.0)
+	level = await _restart(level, 1072.0, 1024.0)
+	assert(level.entry_mode == BaseLevel.EntryMode.HALFWAY_RESPAWN)
+	var camera := get_viewport().get_camera_2d() as LevelCamera
+	assert(camera.scroll_left_limit == 1024.0)
+	level.active_area.update_camera_activity()
+	assert(level.world_objects.get_node(near_name).get_child_count() == 1)
+	_set_camera_left(1552.0)
+	level.active_area.update_camera_activity()
+	assert(level.world_objects.get_node(near_name).get_child_count() == 1)
+	assert(level.world_objects.get_node("red_parakoopa_spawner_114_5").get_child_count() == 2)
 
 
 func _check_1_2(game: Node) -> void:
@@ -70,10 +95,14 @@ func _check_1_2(game: Node) -> void:
 	assert(camera.halfway_check_enabled and camera.halfway_camera_left == 1536.0)
 	assert(level.halfway_spawn.position == Vector2(1584, 208))
 
+	var triplet := _find_1_2_triplet(level)
+	_set_camera_left(area_origin + 1328.0)
+	level.active_area.update_camera_activity()
+	assert(triplet.get_child_count() == 1)
 	_set_camera_left(area_origin + 1329.0)
 	level.active_area.update_camera_activity()
-	var triplet := _find_1_2_triplet(level)
 	assert(triplet.get_child_count() == 4, "The normal approach should spawn all three Goombas.")
+	assert(triplet.get_node("Goomba").global_position.x == area_origin + 1584.0)
 
 	_set_camera_left(area_origin + 1535.0)
 	level = await _restart(level, 48.0, 0.0)
@@ -109,7 +138,7 @@ func _check_1_2(game: Node) -> void:
 
 
 func _find_1_2_triplet(level: BaseLevel) -> EntitySpawner:
-	return level.world_objects.get_node("goomba_triplet_spawner_99_12") as EntitySpawner
+	return level.world_objects.get_node("goomba_triplet_spawner_102_12") as EntitySpawner
 
 
 func _enter_lower_area(level: BaseLevel, camera_left: float) -> void:

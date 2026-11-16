@@ -2,6 +2,8 @@ class_name QuestionBlock
 extends BaseBlock
 
 const BLOCK_COIN := preload("res://scenes/entities/blocks/question/block_coin.gd")
+const VINE_SCRIPT := preload("res://scenes/entities/climbables/vine/growing_vine.gd")
+const VINE := preload("res://scenes/entities/climbables/vine/growing_vine.tscn")
 const TIMED_COIN_TICKS := 231
 
 var power_up_scene: PackedScene
@@ -10,6 +12,8 @@ var reward_started := false
 var reward_ticks_remaining := 0
 var _started_frame := -1
 var _bounce_reward_claimed := false
+var _vine: VINE_SCRIPT
+var _restored_vine_growth := -1
 
 
 func configure_reward(value: Resource) -> void:
@@ -22,6 +26,8 @@ func _ready() -> void:
 	$StateMachine/Bouncing.entered.connect(_release_reward)
 	$StateMachine/Active.entered.connect(_allow_reward)
 	super()
+	if reward_kind == BlockReward.Kind.VINE and _restored_vine_growth >= 0:
+		_add_vine(_restored_vine_growth)
 	if reward_kind == BlockReward.Kind.TIMED_COINS:
 		var level := BaseLevel.containing(self)
 		if level != null:
@@ -46,11 +52,14 @@ func capture_area_state() -> Dictionary:
 	if reward_kind == BlockReward.Kind.TIMED_COINS:
 		data["reward_started"] = reward_started
 		data["reward_ticks_remaining"] = reward_ticks_remaining
+	if is_instance_valid(_vine):
+		data["vine_growth"] = _vine.growth
 	return data
 
 
 func restore_area_state(data: Dictionary) -> void:
 	super.restore_area_state(data)
+	_restored_vine_growth = clampi(int(data.get("vine_growth", -1)), -1, VINE_SCRIPT.FULL_HEIGHT)
 	reward_started = data.get("reward_started", false)
 	reward_ticks_remaining = clampi(data.get("reward_ticks_remaining", 0), 0, TIMED_COIN_TICKS)
 
@@ -70,6 +79,10 @@ func _release_reward() -> void:
 	# Preserve the current artwork unless this hit consumes the final reward.
 	if $StateMachine/Bouncing.return_state == $StateMachine/Inactive:
 		sprite.texture = resolve_texture($StateMachine/Inactive.sprite_texture)
+	if reward_kind == BlockReward.Kind.VINE:
+		_add_vine(0)
+		_vine.start_growth()
+		return
 	if reward_kind == BlockReward.Kind.TIERED_POWER_UP or power_up_scene != null:
 		_release_power_up()
 		return
@@ -80,6 +93,13 @@ func _release_reward() -> void:
 	get_parent().add_child(coin)
 	coin.global_position = global_position + Vector2(8, -8)
 	coin.reset_physics_interpolation()
+
+
+func _add_vine(growth: int) -> void:
+	_vine = VINE.instantiate() as VINE_SCRIPT
+	_vine.growth = growth
+	_vine.visual_theme = visual_theme
+	add_child(_vine)
 
 
 func _release_power_up() -> void:

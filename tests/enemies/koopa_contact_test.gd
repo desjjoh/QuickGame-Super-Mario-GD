@@ -47,7 +47,7 @@ func _ready() -> void:
 	assert(not koopa._defeated and defeats.is_empty())
 	assert(level.spawn_registry._live_spawns[&"enemy"].has(koopa))
 	assert(koopa.sprite.vframes == 2 and koopa.sprite.frame == 4)
-	assert(koopa.sprite.position == Vector2(0, 2))
+	assert(koopa.sprite.position == Vector2(0, 3))
 	assert(not koopa.get_node("Presentation/WalkAnimationSync").enabled)
 	assert(not koopa.receive_hit(EntityHit.new(player, &"stomp", Vector2.DOWN)))
 	var shell_position := koopa.body.global_position

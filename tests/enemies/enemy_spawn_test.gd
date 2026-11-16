@@ -139,7 +139,7 @@ func _test_stage_placements() -> void:
 	assert(layout.tile_set.tile_size == Vector2i(16, 16))
 	# The authored stage is editable. Keep this test's placement independent.
 	layout.clear()
-	layout.set_cell(Vector2i(51, 12), 1, Vector2i.ZERO)
+	layout.set_cell(Vector2i(54, 12), 1, Vector2i.ZERO)
 	for source_id in [0, 1]:
 		var atlas := layout.tile_set.get_source(source_id) as TileSetAtlasSource
 		assert(atlas.get_tile_data(Vector2i.ZERO, 0).texture_origin == Vector2i.ZERO)
@@ -160,6 +160,7 @@ func _test_stage_placements() -> void:
 			continue
 		for offset in placement.actor_offsets:
 			var origin: Vector2 = placement.global_position + offset
+			origin.x -= 48.0
 			# Ground contact is intentional; reject penetration, not a touching floor.
 			query.transform = Transform2D(0, origin + body_offset - Vector2(0, 0.01))
 			assert(
@@ -172,10 +173,10 @@ func _test_stage_placements() -> void:
 			var floor_hit := space.intersect_ray(floor_query)
 			assert(not floor_hit.is_empty(), "No surface below enemy: %s" % origin)
 			assert(is_equal_approx(floor_hit.position.y - feet.y, 0.0))
-	var pair := level.world_objects.get_node("goomba_pair_spawner_51_12") as EntitySpawner
+	var pair := level.world_objects.get_node("goomba_pair_spawner_54_12") as EntitySpawner
 	var camera := level.active_area.get_node("Camera2D") as LevelCamera
 	camera.follow_enabled = false
-	camera.position.x += pair.global_position.x - level.active_area.get_enemy_group_origin_x()
+	camera.position.x += pair.global_position.x - 48.0 - level.active_area.get_enemy_group_origin_x()
 	level.active_area.update_camera_activity()
 	var wake := level.active_area.get_enemy_spawn_region()
 	var actors: Array[BaseEnemy] = []
@@ -201,7 +202,7 @@ func _test_stage_placements() -> void:
 	level._unload_area(area)
 	assert(not is_instance_valid(pair))
 	level._load_area(area)
-	pair = level.world_objects.get_node("goomba_pair_spawner_51_12") as EntitySpawner
+	pair = level.world_objects.get_node("goomba_pair_spawner_54_12") as EntitySpawner
 	pair.update_activity(wake, wake, area.theme)
 	assert(pair.get_child_count() == 3)
 	level.queue_free()

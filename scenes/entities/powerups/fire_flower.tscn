@@ -49,6 +49,7 @@ _data = {&"palette": SubResource("palette_animation")}
 
 [node name="FireFlower" node_paths=PackedStringArray("animation_player") instance=ExtResource("base")]
 script = ExtResource("flower")
+available_sprite_y_offset = 1.0
 animation_player = NodePath("Body/AnimationPlayer")
 
 [node name="Body" parent="." index="1"]

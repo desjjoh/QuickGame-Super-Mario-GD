@@ -1,8 +1,8 @@
 @tool
 extends EntitySpawner
-## One oscillating lift per area visit, independent of the enemy registry.
+## One lift per area visit, independent of the enemy registry.
 
-enum Axis { HORIZONTAL, VERTICAL }
+enum Axis { HORIZONTAL, VERTICAL, RIGHT_ON_LANDING }
 
 const PARSER_X_OFFSET := 12.0
 const PREVIEW := preload("res://scenes/entities/spawners/lift_preview.gd")
@@ -56,13 +56,15 @@ func _draw() -> void:
 	var area := ancestor as BaseLevelArea
 	var area_y := roundi(area.to_local(global_position).y) if area != null else roundi(position.y)
 	var span := _preview_span(area_y)
-	var travel_axis := Vector2.RIGHT if axis == Axis.HORIZONTAL else Vector2.DOWN
+	var travel_axis := Vector2.DOWN if axis == Axis.VERTICAL else Vector2.RIGHT
 	var width := platform_width * MovingLift.TILE_WIDTH
 	PREVIEW.draw_path(self, travel_axis * span.x, travel_axis * span.y, width)
 	PREVIEW.draw_surface(self, Vector2.ZERO, width)
 
 
 func _preview_span(area_y: int) -> Vector2i:
+	if axis == Axis.RIGHT_ON_LANDING:
+		return Vector2i(0, 96)
 	if travel_distance >= 0:
 		if axis == Axis.HORIZONTAL:
 			return Vector2i(-travel_distance, 0)
@@ -111,7 +113,10 @@ func _spawn_lift(theme: AreaTheme) -> void:
 			actor.free()
 			push_error("Single Lift Spawner requires a MovingLift scene.")
 		return
-	_lift.configure_oscillation(axis == Axis.HORIZONTAL, roundi(_area.to_local(global_position).y))
+	if axis == Axis.RIGHT_ON_LANDING:
+		_lift.motion = MovingLift.Motion.RIGHT_ON_LANDING
+	else:
+		_lift.configure_oscillation(axis == Axis.HORIZONTAL, roundi(_area.to_local(global_position).y))
 	_lift.platform_width = platform_width
 	_lift.travel_distance = travel_distance
 	_lift.spawner_manages_activity = true

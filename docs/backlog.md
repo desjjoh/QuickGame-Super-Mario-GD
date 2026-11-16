@@ -16,6 +16,7 @@ Keep the accepted cached audio. Live shared noise-channel playback was removed a
 
 ## Presentation and reference checks
 
+- Revisit the 1-1 secret-room return presentation. From the overworld switch, emergence starts on tick 29 in Godot and tick 25 in Mesen. Both rises take 96 ticks, and the Goombas now match Mesen's spacing at release (152 px and 176 px ahead). Keep the shared 17-tick arrival lock and emergence-based enemy activation when reviewing the four-tick loading gap.
 - Revisit Fire Bar starting angles. Compare the third bar in 1-4 across different approach speeds before deciding whether to reproduce the NES's reused angle.
 
 - Add the reference Bowser flame spawn cue and verify playback against Mesen. Implement the later castle attack and reveal variants as those stages are built. Review the traced front and rear Starman outcomes before implementing that interaction.

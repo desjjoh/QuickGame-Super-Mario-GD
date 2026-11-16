@@ -7,6 +7,7 @@ extends PlayerState
 @export var downward_animation_speed: float = 2.0
 
 var _animation_speed: float = 1.0
+var _lost_contact := false
 
 
 func enter() -> void:
@@ -24,6 +25,11 @@ func process_physics(delta: float) -> BaseState:
 	if not advance_climb(get_movement_axis(), delta):
 		# step exits before integrating; Move consumes this tick once on release.
 		return continue_physics(move_state, delta)
+	var player := get_player()
+	var surface := player.climbing.get_surface()
+	if is_instance_valid(surface) and surface.requires_live_contact() and not surface.can_attach(player):
+		_lost_contact = true
+		return move_state
 	return null
 
 
@@ -33,7 +39,12 @@ func advance_climb(axis: Vector2, delta: float, vertical_step: float = NAN) -> b
 	if not player.climbing.step(player, axis, delta, vertical_step):
 		return false
 	if player.animation_player != null and animation_name != &"":
-		if not is_equal_approx(before.y, player.body.global_position.y):
+		var moving := not is_equal_approx(before.y, player.body.global_position.y)
+		var surface := player.climbing.get_surface()
+		# A live climb can consume a fractional step with no whole-pixel displacement.
+		if surface.requires_live_contact():
+			moving = not is_zero_approx(player.body.velocity.y)
+		if moving:
 			player.animation_player.speed_scale = (
 				upward_animation_speed if axis.y < 0.0 else downward_animation_speed
 			)
@@ -56,4 +67,5 @@ func exit() -> void:
 	if player.animation_player != null:
 		player.animation_player.stop(true)
 		player.animation_player.speed_scale = _animation_speed
-	player.climbing.detach(player)
+	player.climbing.detach(player, _lost_contact)
+	_lost_contact = false

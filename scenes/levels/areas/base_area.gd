@@ -5,6 +5,8 @@ extends Node2D
 signal area_theme_changed(theme: AreaTheme)
 ## Owns area layouts, entities, camera, theme, and entry/exit lifecycle.
 
+const ENEMY_SPAWN_LOOKAHEAD := 48.0
+
 @export_group("Background")
 ## Transparent preserves the viewport backdrop. Fill never contributes shadow alpha.
 @export var background_color := Color(0, 0, 0, 0):
@@ -30,6 +32,8 @@ var actors_suspended := false
 @export var area_id: StringName
 @export var background_music: MusicHandler.Track = MusicHandler.Track.OVERWORLD
 @export var transport_points: Array[TransportPlacement] = []
+## Route a fall below this area to an endpoint in the same level.
+@export var fall_destination: TransportDestination
 @export var question_block_rewards: Dictionary[Vector2i, Resource] = {}
 @export var pipe_spawns: Dictionary[Vector2i, Resource] = {}
 var _transport_cells: Dictionary[Vector2i, StringName] = {}
@@ -294,7 +298,7 @@ func get_enemy_spawn_region() -> Rect2:
 	var region := get_activity_region(false)
 	var view := get_activity_region(false).grow(-activation_buffer)
 	var right_pixel := floorf(view.end.x) - 1.0
-	var cutoff := floorf((right_pixel + 48.0) / 16.0) * 16.0
+	var cutoff := floorf((right_pixel + ENEMY_SPAWN_LOOKAHEAD) / 16.0) * 16.0
 	region.position.x = floorf(view.position.x)
 	region.size.x = cutoff + 1.0 - region.position.x
 	return region
@@ -371,12 +375,16 @@ func initialize_actors(suspended: bool) -> void:
 
 
 func _activate_spawners(wake_region: Rect2, sleep_region: Rect2) -> void:
+	var level := BaseLevel.containing(self)
+	var hold_enemies := level != null and level.area_transport.enemy_spawns_held
 	for id: int in _spawners.keys():
 		var spawner := _spawners[id].get_ref() as Node2D
 		if not is_instance_valid(spawner):
 			_spawners.erase(id)
 			continue
 		var enemy_placement: bool = spawner is EntitySpawner and spawner.spawn_category == &"enemy"
+		if enemy_placement and hold_enemies:
+			continue
 		spawner.update_activity(
 			get_enemy_spawn_region() if enemy_placement else wake_region, sleep_region, theme
 		)

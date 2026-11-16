@@ -13,6 +13,7 @@ var _emergence_elapsed := 0.0
 var _level: BaseLevel
 
 @export var pickup: Area2D
+@export var available_sprite_y_offset := 0.0
 @export_range(0, 16) var minimum_pickup_rise: int = 4
 
 
@@ -28,6 +29,8 @@ func _ready() -> void:
 	if _emergence_remaining > 0.0:
 		sprite.hide()
 		SoundHandler.play_reward(&"power_up_reveal")
+	else:
+		sprite.offset.y += available_sprite_y_offset
 	set_process(false)
 
 
@@ -61,7 +64,7 @@ func _advance_emergence(delta: float) -> void:
 		var clearance := _emergence_clearance()
 		# Keep the settling step in physics and align the artwork to the NES scanline.
 		position.y -= clearance
-		sprite.offset.y += clearance
+		sprite.offset.y += clearance + available_sprite_y_offset
 		DRAW_ORDER.apply(sprite, DRAW_ORDER.AVAILABLE_ITEM)
 		reset_physics_interpolation()
 		pickup.set_deferred("monitoring", true)

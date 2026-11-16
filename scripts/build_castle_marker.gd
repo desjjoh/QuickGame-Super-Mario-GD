@@ -7,7 +7,7 @@ func _initialize() -> void:
 	if not _build("castle", PREVIEW.THEME_NAMES):
 		quit(1)
 		return
-	if not _build("large_castle", ["overworld"]):
+	if not _build("large_castle", ["overworld", "underwater"]):
 		quit(1)
 		return
 	print("Castle marker previews: PASS")

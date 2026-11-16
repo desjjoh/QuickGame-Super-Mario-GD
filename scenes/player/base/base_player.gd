@@ -134,10 +134,10 @@ func _advance_arrival_control_lock() -> void:
 
 
 ## AreaTransport arms this at placement, before any exit presentation advances.
-func begin_arrival_control_lock() -> void:
+func begin_arrival_control_lock(ticks: int = ARRIVAL_CONTROL_TICKS) -> void:
 	if is_shutdown or is_dead:
 		return
-	arrival_control_ticks_remaining = ARRIVAL_CONTROL_TICKS
+	arrival_control_ticks_remaining = ticks
 	_sync_controller_input()
 
 
@@ -218,7 +218,7 @@ func _on_jump_started() -> void:
 var camera_correction_x: float = 0.0
 
 
-func move_body(gravity_after_motion: bool = false) -> void:
+func move_body(gravity_after_motion: bool = false) -> bool:
 	var delta := get_physics_process_delta_time()
 	var vertical_speed := body.velocity.y
 	var rising := vertical_speed < 0.0
@@ -236,6 +236,8 @@ func move_body(gravity_after_motion: bool = false) -> void:
 	var hidden_hit := rising and bonk_action.deliver_hidden(self, previous_position)
 	if rising and (hidden_hit or bonk_action.check_ceiling(self, previous_position, intended_motion)):
 		respond_to_ceiling()
+		return true
+	return false
 
 
 func _sweep_motion(delta: float, vertical_speed: float) -> void:

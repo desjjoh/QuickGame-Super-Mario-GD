@@ -1,6 +1,8 @@
 extends EnemyDefeatedState
 ## Goomba's block defeat moves the body before revealing the launch pose.
 
+const LAUNCH_SPRITE_Y := 2.0
+
 var block_launch := false
 var _launch_presentation := (
 	preload("res://scenes/components/presentation/block_launch_presentation.gd").new()
@@ -25,9 +27,9 @@ func enter() -> void:
 func _apply_launch_pose() -> void:
 	super()
 	if fireball_launch:
-		entity.sprite.position.y += 2.0
+		entity.sprite.position.y = LAUNCH_SPRITE_Y
 	elif star_launch:
-		entity.sprite.position = _star_pose.original_position + Vector2(0, 2)
+		entity.sprite.position = Vector2(_star_pose.original_position.x, LAUNCH_SPRITE_Y)
 	if not block_launch:
 		entity.sprite.frame = 0
 
@@ -40,7 +42,7 @@ func process_physics(delta: float) -> BaseState:
 		entity.sprite.flip_v = true
 		# The reference inverted artwork sits two pixels below the body's launch lift.
 		_launch_presentation.reveal(
-			entity.sprite, _launch_presentation.original_position + Vector2(0.0, 2.0)
+			entity.sprite, Vector2(_launch_presentation.original_position.x, LAUNCH_SPRITE_Y)
 		)
 	return super.process_physics(delta)
 

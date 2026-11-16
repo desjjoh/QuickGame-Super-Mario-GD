@@ -8,11 +8,12 @@
 [ext_resource type="Script" uid="uid://bxsgrgah547n1" path="res://scenes/ui/shared_shadow_composer.gd" id="4_composer"]
 [ext_resource type="PackedScene" uid="uid://cvyf66ojyt46s" path="res://scenes/levels/worlds/world 1/1-3.tscn" id="4_level"]
 [ext_resource type="PackedScene" uid="uid://c547aakap4jow" path="res://scenes/levels/worlds/world 1/1-4.tscn" id="5_kjrfb"]
+[ext_resource type="PackedScene" uid="uid://y0wmdsmhed65" path="res://scenes/levels/worlds/world 2/2-1.tscn" id="6_se30j"]
 
 [node name="Game" type="CanvasLayer" unique_id=445540570]
 layer = 0
 script = ExtResource("1_script")
-stages = Array[PackedScene]([ExtResource("2_level"), ExtResource("3_level"), ExtResource("4_level"), ExtResource("5_kjrfb")])
+stages = Array[PackedScene]([ExtResource("2_level"), ExtResource("3_level"), ExtResource("4_level"), ExtResource("5_kjrfb"), ExtResource("6_se30j")])
 enemy_limit = 10
 save_entity_state_through_death = false
 shadow_style = ExtResource("3_gf1f2")

@@ -447,9 +447,11 @@ func _commit_area_arrival(
 	var camera := area.get_node("Camera2D") as LevelCamera
 	camera.make_current()
 	camera.snap_to_arrival(player.body, arrival.get("camera_sprite_x", -1.0))
+	if arrival.get("skip_passed_enemies", false):
+		area_content.skip_enemy_spawns_before(area, area.get_enemy_group_origin_x())
 	var previous_area := active_area
 	active_area = area
-	player.begin_arrival_control_lock()
+	player.begin_arrival_control_lock(arrival.get("control_lock_ticks", BasePlayer.ARRIVAL_CONTROL_TICKS))
 	if leaving_opening:
 		MusicHandler.stop_area(self)
 		opening_presentation.cancel()
@@ -496,15 +498,15 @@ func _load_area(area: BaseLevelArea, starting_at_halfway := false) -> void:
 		return
 	var snapshot := GameHandler.get_area_progress(_progress_key, area.area_id)
 	area.load_runtime(snapshot)
-	var enemy_cutoff_x := -INF
+	area_content.populate(area, snapshot.get("entities", {}))
 	# The camera is recreated when returning to a streamed-out area.
 	if entry_mode == EntryMode.HALFWAY_RESPAWN and area == $Areas/MainArea:
 		var camera := area.get_node("Camera2D") as LevelCamera
 		camera.halfway_left_limit_active = camera.halfway_check_enabled
 		if starting_at_halfway and camera.halfway_left_limit_active:
 			var view_width := camera.get_viewport_rect().size.x / camera.zoom.x
-			enemy_cutoff_x = floorf(camera.scroll_left_limit + view_width) - 1.0
-	area_content.populate(area, snapshot.get("entities", {}), enemy_cutoff_x)
+			var right_edge := floorf(camera.scroll_left_limit + view_width) - 1.0
+			area_content.skip_enemy_spawns_before(area, right_edge)
 	if ending_presentation != null:
 		ending_presentation.bind_area(area)
 	_spawned_areas[area.get_instance_id()] = true
@@ -538,8 +540,15 @@ func _check_fall_death() -> void:
 		camera.global_position.y if camera is LevelCamera else camera.get_screen_center_position().y
 	)
 	var bottom := center_y + get_viewport_rect().size.y / camera.zoom.y / 2.0
-	if player.death_envelope_top() > bottom + fall_death_margin:
-		on_death(player, false)
+	if player.death_envelope_top() <= bottom + fall_death_margin:
+		return
+	if (
+		is_instance_valid(active_area)
+		and active_area.fall_destination != null
+		and area_transport.begin(player, active_area.fall_destination, null, false)
+	):
+		return
+	on_death(player, false)
 
 
 func on_complete(

@@ -155,8 +155,10 @@ func resolve(player: BasePlayer, before: Vector2, was_rising: bool, crouched: bo
 	# HeadChk uses the NES origin (feet - 32), whose low nibble equals feet mod 16.
 	var head_phase := posmod(int(floorf(player.body.global_position.y)), 16)
 	if not crouched and was_rising and head_phase >= 4:
-		var from := before + head + Vector2(0.0001, 0.001)
 		var to := player.body.global_position + head + Vector2(0.0001, 0.0001)
+		# Sample the center head at its new column. A diagonal ray can hit the
+		# tile side first even when the head crossed its underside this tick.
+		var from := Vector2(to.x, before.y + head.y + PROBE_EPSILON)
 		if to.y < from.y:
 			var query := PhysicsRayQueryParameters2D.create(
 				from, to, player.body.collision_mask, [player.body.get_rid()]

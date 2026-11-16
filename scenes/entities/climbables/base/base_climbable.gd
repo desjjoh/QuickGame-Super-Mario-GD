@@ -108,3 +108,12 @@ func _on_body_exited(body: Node2D) -> void:
 
 func attachment_y(feet_y: float) -> float:
 	return clampf(feet_y, climb_top.global_position.y, climb_bottom.global_position.y)
+
+
+func requires_live_contact() -> bool:
+	return false
+
+
+func has_nes_side_alignment(feet_x: float) -> bool:
+	var offset := feet_x - climb_top.global_position.x
+	return (offset >= -10.0 and offset < -6.0) or (offset >= 6.0 and offset < 10.0)

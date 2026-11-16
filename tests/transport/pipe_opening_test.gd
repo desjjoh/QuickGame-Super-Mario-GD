@@ -1,6 +1,7 @@
 extends Node
 
 const STAGE := preload("res://scenes/levels/worlds/world 1/1-2.tscn")
+const WORLD_2_START := preload("res://scenes/levels/worlds/world 2/2-1.tscn")
 const DRAW_ORDER := preload("res://scenes/components/presentation/draw_order.gd")
 
 signal tick_finished
@@ -167,7 +168,7 @@ func _ready() -> void:
 	await _check_warps()
 	game.free()
 	await tick_finished
-	print("PASS: 1-2 opening, respawn, secret round trip, handoff to 1-3, and three stage warps")
+	print("PASS: 1-2 opening, respawn, secret round trip, handoff to 1-3, three stage warps, and 2-1 secret round trip")
 	await preload("res://tests/fixtures/finish_test.gd").finish(get_tree())
 
 
@@ -309,11 +310,23 @@ func _check_warps() -> void:
 				break
 			await tick_finished
 		assert(GameHandler.current_level != source and not GameHandler.transitions.busy)
-		assert(
-			GameHandler.current_level.stage_label == "1-1" and GameHandler.current_stage_index == 0
+		var expected_stage: PackedScene = (
+			WORLD_2_START if pipe_id == &"warp_2" else GameHandler.current_game.stages[0]
 		)
+		var expected_index: int = GameHandler.current_game.stages.find(expected_stage)
+		assert(expected_index >= 0 and GameHandler.current_stage_index == expected_index)
+		assert(GameHandler.current_level.scene_file_path == expected_stage.resource_path)
 		assert(GameHandler.current_level.entry_mode == BaseLevel.EntryMode.STAGE_START)
 		var arrived := GameHandler.current_player as Mario
 		assert(arrived.scene_file_path == "res://scenes/player/luigi/luigi.tscn")
 		assert(arrived.form_controller.current_form == arrived.fire_form)
 		assert(GameHandler.player_status.score == 1230 and GameHandler.player_status.coins == 7)
+
+	var world_two := GameHandler.current_level
+	await _take_pipe(world_two, &"secret_entrance", &"underground_secret", &"arrival")
+	assert(world_two.active_endpoint == world_two.active_area.get_node("Arrival"))
+	await _take_pipe(world_two, &"secret_return", &"main", &"secret_exit")
+	var objects := world_two.world_objects
+	for marker in ["goomba_spawner_116_10", "goomba_spawner_120_12"]:
+		assert(objects.has_node(marker) and not objects.has_node(marker + "/Goomba"))
+	assert(objects.has_node("pipe_entrance_115_11/OccupantSpawner/GreenPiranhaPlant"))

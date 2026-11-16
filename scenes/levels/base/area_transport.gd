@@ -4,6 +4,7 @@ extends Node
 
 var input_locked: bool = false
 var pending: bool = false
+var enemy_spawns_held := false
 var _transport_state: PlayerTransportState = null
 var _transport_trip: Dictionary = {}
 var _transport_exiting: bool = false
@@ -24,6 +25,12 @@ func advance() -> bool:
 			or level.player.state_machine.current_state != _transport_state
 		):
 			cancel(true)
+		elif (
+			enemy_spawns_held
+			and (_transport_state as PlayerPipeEnterState).has_started_emergence()
+		):
+			# Open the spawn gate after the first emergence tick has finished.
+			_release_enemy_spawns.call_deferred(_transport_phase)
 		return true
 	if (
 		ControllerHandler.input_down <= 0.5
@@ -33,6 +40,11 @@ func advance() -> bool:
 	):
 		input_locked = false
 	return false
+
+
+func _release_enemy_spawns(phase: int) -> void:
+	if phase == _transport_phase:
+		enemy_spawns_held = false
 
 
 func _resolve_area(id: StringName) -> BaseLevelArea:
@@ -69,7 +81,8 @@ func begin(
 	traveler: BasePlayer,
 	destination: TransportDestination,
 	source: TransportEntity,
-	animate_arrival: bool
+	animate_arrival: bool,
+	use_cover: bool = true
 ) -> bool:
 	if not _can_begin(traveler, destination):
 		return false
@@ -110,7 +123,8 @@ func begin(
 			"area_id": destination.area_id,
 			"target_id": destination.target_id,
 			"source": weakref(source) if source != null else null,
-			"animate": animate_arrival
+			"animate": animate_arrival,
+			"use_cover": use_cover
 		},
 		source,
 		state
@@ -221,6 +235,9 @@ func _arrival_data(area: BaseLevelArea, target_id: StringName, animate: bool) ->
 		# Existing standalone spawns remain valid; animated legacy markers adapt to pipe presentation.
 		return {
 			"position": definition.global_position,
+			"camera_sprite_x": definition.camera_sprite_x,
+			"control_lock_ticks": definition.control_lock_ticks,
+			"skip_passed_enemies": definition.skip_passed_enemies,
 			"direction": definition.get_exit_vector(),
 			"distance": definition.exit_distance,
 			"state": level.player.pipe_enter_state if animate and definition.animate_exit else null,
@@ -240,7 +257,7 @@ func _finish_transport(phase: int) -> void:
 	if stage != null:
 		_finish_stage_warp(stage)
 		return
-	if not _transport_exiting and GameHandler.transitions.available():
+	if not _transport_exiting and _transport_trip["use_cover"] and GameHandler.transitions.available():
 		if (
 			GameHandler.transitions.begin(
 				level,
@@ -357,6 +374,13 @@ func _arrive_at_destination(under_cover: bool) -> void:
 		_transport_state.commit_transfer()
 	_disconnect_transport_state()
 	input_locked = true
+	enemy_spawns_held = (
+		arrival_state is PlayerPipeEnterState
+		and arrival["direction"] == Vector2.UP
+	)
+	arrival["skip_passed_enemies"] = (
+		not was_loaded and (enemy_spawns_held or arrival.get("skip_passed_enemies", false))
+	)
 	if not level._commit_area_arrival(area, trip["target_id"], arrival, under_cover):
 		cancel(false)
 		return
@@ -389,6 +413,7 @@ func _disconnect_transport_state() -> void:
 	_transport_completion_callback = Callable()
 	_transport_trip.clear()
 	_transport_exiting = false
+	enemy_spawns_held = false
 
 
 func cancel(resume_player: bool) -> void:

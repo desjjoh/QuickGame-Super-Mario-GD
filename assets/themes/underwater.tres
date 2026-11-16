@@ -1,0 +1,95 @@
+[gd_resource type="Resource" script_class="AreaTheme" format=3]
+
+[ext_resource type="Script" path="res://scripts/themes/area_theme.gd" id="theme"]
+[ext_resource type="Script" path="res://scripts/player/player_palette.gd" id="palette_script"]
+[ext_resource type="TileSet" path="res://assets/tileset/underwater/terrain.tres" id="terrain"]
+[ext_resource type="TileSet" path="res://assets/tileset/underwater/decorations.tres" id="decorations"]
+[ext_resource type="TileSet" path="res://assets/tileset/underwater/enemy_layout.tres" id="enemy_layout"]
+[ext_resource type="FontFile" path="res://assets/palettes/underwater/ui/alphabet-alt.fnt" id="title_accent"]
+[ext_resource type="Resource" path="res://assets/player/forms/fire_palettes/underwater_gold.tres" id="underwater_gold"]
+[ext_resource type="Resource" path="res://assets/player/forms/fire_palettes/underwater_grayscale.tres" id="underwater_grayscale"]
+[ext_resource type="Resource" path="res://assets/player/forms/fire_palettes/palette_3.tres" id="fire"]
+[ext_resource type="Texture2D" path="res://assets/palettes/underwater/enemies/bowser.png" id="enemies_bowser"]
+[ext_resource type="Texture2D" path="res://assets/palettes/underwater/enemies/goomba.png" id="enemies_goomba"]
+[ext_resource type="Texture2D" path="res://assets/palettes/underwater/enemies/koopa.png" id="enemies_koopa"]
+[ext_resource type="Texture2D" path="res://assets/palettes/underwater/enemies/piranha-plant.png" id="enemies_piranha_plant"]
+[ext_resource type="Texture2D" path="res://assets/palettes/underwater/interactibles/blocks/brick-alternate.tres" id="interactibles_blocks_brick_alternate"]
+[ext_resource type="Texture2D" path="res://assets/palettes/underwater/interactibles/blocks/brick.tres" id="interactibles_blocks_brick"]
+[ext_resource type="Texture2D" path="res://assets/palettes/underwater/interactibles/blocks/hidden-question-block.tres" id="interactibles_blocks_hidden_question_block"]
+[ext_resource type="Texture2D" path="res://assets/palettes/underwater/interactibles/blocks/question-block-2.tres" id="interactibles_blocks_question_block_2"]
+[ext_resource type="Texture2D" path="res://assets/palettes/underwater/interactibles/blocks/question-block-3.tres" id="interactibles_blocks_question_block_3"]
+[ext_resource type="Texture2D" path="res://assets/palettes/underwater/interactibles/blocks/question-block-4.tres" id="interactibles_blocks_question_block_4"]
+[ext_resource type="Texture2D" path="res://assets/palettes/underwater/interactibles/blocks/question-block.tres" id="interactibles_blocks_question_block"]
+[ext_resource type="Texture2D" path="res://assets/palettes/underwater/interactibles/items/coins.tres" id="interactibles_items_coins"]
+[ext_resource type="Texture2D" path="res://assets/palettes/underwater/interactibles/items/green-mushroom.png" id="interactibles_items_green_mushroom"]
+[ext_resource type="Texture2D" path="res://assets/palettes/underwater/interactibles/pipes/pipe-1.tres" id="interactibles_pipes_pipe_1"]
+[ext_resource type="Texture2D" path="res://assets/palettes/underwater/interactibles/pipes/pipe-2.tres" id="interactibles_pipes_pipe_2"]
+[ext_resource type="Texture2D" path="res://assets/palettes/underwater/interactibles/pipes/pipe-h-1.tres" id="interactibles_pipes_pipe_h_1"]
+[ext_resource type="Texture2D" path="res://assets/palettes/underwater/interactibles/pipes/pipe-h-2.tres" id="interactibles_pipes_pipe_h_2"]
+[ext_resource type="Texture2D" path="res://assets/palettes/underwater/interactibles/pipes/pipe-top-1.tres" id="interactibles_pipes_pipe_top_1"]
+[ext_resource type="Texture2D" path="res://assets/palettes/underwater/interactibles/pipes/pipe-top-2.tres" id="interactibles_pipes_pipe_top_2"]
+[ext_resource type="Texture2D" path="res://assets/palettes/underwater/interactibles/pipes/pipe-top-h-1.tres" id="interactibles_pipes_pipe_top_h_1"]
+[ext_resource type="Texture2D" path="res://assets/palettes/underwater/interactibles/pipes/pipe-top-h-2.tres" id="interactibles_pipes_pipe_top_h_2"]
+[ext_resource type="Texture2D" path="res://assets/palettes/underwater/misc/flagpole-flag.png" id="misc_flagpole_flag"]
+[ext_resource type="Texture2D" path="res://assets/palettes/underwater/misc/flagpole-pole.tres" id="misc_flagpole_pole"]
+[ext_resource type="Texture2D" path="res://assets/palettes/underwater/misc/flagpole-top.tres" id="misc_flagpole_top"]
+[ext_resource type="Texture2D" path="res://assets/palettes/underwater/misc/green-mushroom.png" id="misc_green_mushroom"]
+[ext_resource type="Texture2D" path="res://assets/palettes/underwater/misc/starman.png" id="misc_starman"]
+[ext_resource type="Texture2D" path="res://assets/palettes/underwater/misc/vine.png" id="misc_vine"]
+[ext_resource type="Texture2D" path="res://assets/palettes/underwater/tileset/block.tres" id="tileset_block"]
+[ext_resource type="Texture2D" path="res://assets/palettes/underwater/tileset/Palette 1 (Ground and Stone).png" id="tileset_Palette_1_Ground_and_Stone"]
+[ext_resource type="Texture2D" path="res://assets/palettes/underwater/tileset/Palette 2 (Water and Sky).png" id="tileset_Palette_2_Water_and_Sky"]
+[ext_resource type="Texture2D" path="res://assets/palettes/underwater/tileset/Palette 3 (Pipes and Scenery).png" id="tileset_Palette_3_Pipes_and_Scenery"]
+[ext_resource type="Texture2D" path="res://assets/palettes/underwater/tileset/Palette 4 (Coins and Interactibles).png" id="tileset_Palette_4_Coins_and_Interactibles"]
+[ext_resource type="Texture2D" path="res://assets/palettes/underwater/ui/hud-coin.png" id="ui_hud_coin"]
+[ext_resource type="Texture2D" path="res://assets/palettes/underwater/ui/start-cursor.png" id="ui_start_cursor"]
+[ext_resource type="Texture2D" path="res://assets/palettes/underwater/ui/start-title.png" id="ui_start_title"]
+
+[ext_resource type="TileSet" path="res://assets/tileset/underwater/entity_layout.tres" id="entity_layout"]
+
+[resource]
+script = ExtResource("theme")
+display_name = "Underwater"
+title_accent_font = ExtResource("title_accent")
+terrain = ExtResource("terrain")
+decorations = ExtResource("decorations")
+entity_markers = ExtResource("entity_layout")
+enemy_markers = ExtResource("enemy_layout")
+texture_overrides = Dictionary[String, Texture2D]({
+"res://assets/palettes/overworld/enemies/bowser.png": ExtResource("enemies_bowser"),
+"res://assets/palettes/overworld/enemies/goomba.png": ExtResource("enemies_goomba"),
+"res://assets/palettes/overworld/enemies/koopa.png": ExtResource("enemies_koopa"),
+"res://assets/palettes/overworld/enemies/piranha-plant.png": ExtResource("enemies_piranha_plant"),
+"res://assets/palettes/overworld/interactibles/blocks/brick-alternate.tres": ExtResource("interactibles_blocks_brick_alternate"),
+"res://assets/palettes/overworld/interactibles/blocks/brick.tres": ExtResource("interactibles_blocks_brick"),
+"res://assets/palettes/overworld/interactibles/blocks/hidden-question-block.tres": ExtResource("interactibles_blocks_hidden_question_block"),
+"res://assets/palettes/overworld/interactibles/blocks/question-block-2.tres": ExtResource("interactibles_blocks_question_block_2"),
+"res://assets/palettes/overworld/interactibles/blocks/question-block-3.tres": ExtResource("interactibles_blocks_question_block_3"),
+"res://assets/palettes/overworld/interactibles/blocks/question-block-4.tres": ExtResource("interactibles_blocks_question_block_4"),
+"res://assets/palettes/overworld/interactibles/blocks/question-block.tres": ExtResource("interactibles_blocks_question_block"),
+"res://assets/palettes/overworld/interactibles/items/coins.tres": ExtResource("interactibles_items_coins"),
+"res://assets/palettes/overworld/interactibles/items/green-mushroom.png": ExtResource("interactibles_items_green_mushroom"),
+"res://assets/palettes/overworld/interactibles/pipes/pipe-1.tres": ExtResource("interactibles_pipes_pipe_1"),
+"res://assets/palettes/overworld/interactibles/pipes/pipe-2.tres": ExtResource("interactibles_pipes_pipe_2"),
+"res://assets/palettes/overworld/interactibles/pipes/pipe-h-1.tres": ExtResource("interactibles_pipes_pipe_h_1"),
+"res://assets/palettes/overworld/interactibles/pipes/pipe-h-2.tres": ExtResource("interactibles_pipes_pipe_h_2"),
+"res://assets/palettes/overworld/interactibles/pipes/pipe-top-1.tres": ExtResource("interactibles_pipes_pipe_top_1"),
+"res://assets/palettes/overworld/interactibles/pipes/pipe-top-2.tres": ExtResource("interactibles_pipes_pipe_top_2"),
+"res://assets/palettes/overworld/interactibles/pipes/pipe-top-h-1.tres": ExtResource("interactibles_pipes_pipe_top_h_1"),
+"res://assets/palettes/overworld/interactibles/pipes/pipe-top-h-2.tres": ExtResource("interactibles_pipes_pipe_top_h_2"),
+"res://assets/palettes/overworld/misc/flagpole-flag.png": ExtResource("misc_flagpole_flag"),
+"res://assets/palettes/overworld/misc/flagpole-pole.tres": ExtResource("misc_flagpole_pole"),
+"res://assets/palettes/overworld/misc/flagpole-top.tres": ExtResource("misc_flagpole_top"),
+"res://assets/palettes/overworld/misc/green-mushroom.png": ExtResource("misc_green_mushroom"),
+"res://assets/palettes/overworld/misc/starman.png": ExtResource("misc_starman"),
+"res://assets/palettes/overworld/misc/vine.png": ExtResource("misc_vine"),
+"res://assets/palettes/overworld/tileset/block.tres": ExtResource("tileset_block"),
+"res://assets/palettes/overworld/tileset/Palette 1 (Ground and Stone).png": ExtResource("tileset_Palette_1_Ground_and_Stone"),
+"res://assets/palettes/overworld/tileset/Palette 2 (Water and Sky).png": ExtResource("tileset_Palette_2_Water_and_Sky"),
+"res://assets/palettes/overworld/tileset/Palette 3 (Pipes and Scenery).png": ExtResource("tileset_Palette_3_Pipes_and_Scenery"),
+"res://assets/palettes/overworld/tileset/Palette 4 (Coins and Interactibles).png": ExtResource("tileset_Palette_4_Coins_and_Interactibles"),
+"res://assets/palettes/overworld/ui/hud-coin.png": ExtResource("ui_hud_coin"),
+"res://assets/palettes/overworld/ui/start-cursor.png": ExtResource("ui_start_cursor"),
+"res://assets/palettes/overworld/ui/start-title.png": ExtResource("ui_start_title")
+})
+fire_transform_palettes = Array[ExtResource("palette_script")]([ExtResource("underwater_gold"), ExtResource("fire"), ExtResource("underwater_grayscale")])

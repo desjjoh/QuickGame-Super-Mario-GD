@@ -38,7 +38,7 @@ func _ready() -> void:
 		load("res://scenes/entities/spawners/goomba_pair_spawner.tscn").instantiate()
 		as EntitySpawner
 	)
-	pair.position = Vector2(816, 192)
+	pair.position = Vector2(864, 192)
 	level.world_objects.add_child(pair)
 	assert(shell.receive_hit(EntityHit.new(null, &"stomp", Vector2.DOWN)))
 	assert(shell.receive_hit(EntityHit.new(null, &"kick", Vector2.ZERO)))

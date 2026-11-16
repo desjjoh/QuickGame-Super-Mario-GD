@@ -1,5 +1,8 @@
 extends "res://scenes/entities/enemies/koopa/koopa.gd"
 
+@export var face_attacker_after_stomp := true
+@export var wing_loss_score_delay := DELAYED_REWARD.DELAY_TICKS
+
 
 func _can_hurt_player() -> bool:
 	return state_machine.current_state == $StateMachine/Flying or super()
@@ -17,8 +20,9 @@ func _accept_hit(hit: EntityHit) -> bool:
 	var walking := $StateMachine/Walking
 	var reward_position := reward_popup_position()
 	if hit.attacker is BasePlayer:
-		walking.initial_direction = -int(away_from_attacker(hit))
+		var direction := int(away_from_attacker(hit))
+		walking.initial_direction = -direction if face_attacker_after_stomp else direction
 	if not state_machine.change_state(walking):
 		return false
-	award_score(400, reward_position)
+	award_score(400, reward_position, wing_loss_score_delay)
 	return true

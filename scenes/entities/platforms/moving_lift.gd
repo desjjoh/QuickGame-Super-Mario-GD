@@ -3,9 +3,10 @@ extends SpawnableEntity
 ## Moves after the player. Contact uses the old lift position and carry uses the new one.
 
 enum Direction { UP = -1, DOWN = 1 }
-enum Motion { REPEATING, HORIZONTAL, VERTICAL }
+enum Motion { REPEATING, HORIZONTAL, VERTICAL, RIGHT_ON_LANDING }
 enum Width { SMALL = 2, MEDIUM = 3, LARGE = 4 }
 
+const CLOUD_ART := preload("res://assets/items/cloud-platform.png")
 const TILE_WIDTH := 16
 const CONTACT_HEIGHT := 13
 const FRACTION_UNITS := 16
@@ -31,6 +32,7 @@ var _vertical_motion: VERTICAL_OSCILLATION
 var _top_y := 0
 var _center_y := 0
 var _travel_progress := 0
+var _rightward_started := false
 var _level: BaseLevel
 
 
@@ -43,6 +45,9 @@ func _ready() -> void:
 		var extra := right.duplicate() as Sprite2D
 		extra.position.x += TILE_WIDTH
 		$Presentation.add_child(extra)
+	if motion == Motion.RIGHT_ON_LANDING:
+		for segment: Sprite2D in $Presentation.get_children():
+			segment.texture = CLOUD_ART
 	super()
 	_level = BaseLevel.containing(self)
 	DRAW_ORDER.apply($Presentation, DRAW_ORDER.ENEMY)
@@ -54,7 +59,7 @@ func _physics_process(delta: float) -> void:
 	if is_instance_valid(player) and player.form_presentation.blocks_actor_motion():
 		return
 	var rider := is_instance_valid(player) and player.can_contact_lift() and _check_contact(player)
-	var step := _motion_step(GameHandler.animation_clock.tick_count)
+	var step := _motion_step(GameHandler.animation_clock.tick_count, rider)
 	position += step
 	if rider and not reached_outgoing_edge():
 		player.land_on_lift(self, step.x)
@@ -83,7 +88,11 @@ static func vertical_anchors(area_y: int) -> Vector2i:
 	return Vector2i(0, 64) if start_y < 128 else Vector2i(256 - 2 * start_y, -64)
 
 
-func _motion_step(frame: int) -> Vector2:
+func _motion_step(frame: int, rider: bool) -> Vector2:
+	if motion == Motion.RIGHT_ON_LANDING:
+		var step := Vector2.RIGHT if _rightward_started else Vector2.ZERO
+		_rightward_started = _rightward_started or rider
+		return step
 	if travel_distance >= 0:
 		return _bounded_travel_step()
 	match motion:
