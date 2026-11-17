@@ -40,6 +40,7 @@ func _physics_process(_delta: float) -> void:
 		or player.is_shutdown
 		or player.gameplay_suspended
 		or player.activity_suspended
+		or player.arrival_control_ticks_remaining > 0
 		or not area.is_active
 		or area.actors_suspended
 		or not player.state_machine.current_state is MarioSwimState

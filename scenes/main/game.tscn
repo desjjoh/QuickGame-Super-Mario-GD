@@ -15,8 +15,10 @@
 layer = 0
 script = ExtResource("1_script")
 stages = Array[PackedScene]([ExtResource("2_level"), ExtResource("3_level"), ExtResource("4_level"), ExtResource("5_kjrfb"), ExtResource("6_se30j"), ExtResource("7_level")])
+start_stage_override = ExtResource("7_level")
 enemy_limit = 10
 save_entity_state_through_death = false
+integer_scaling = true
 shadow_style = ExtResource("3_gf1f2")
 
 [node name="Backdrop" type="ColorRect" parent="." unique_id=1548777008]

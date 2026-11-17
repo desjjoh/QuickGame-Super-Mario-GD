@@ -221,7 +221,6 @@ var camera_correction_x: float = 0.0
 func move_body(gravity_after_motion: bool = false) -> bool:
 	var delta := get_physics_process_delta_time()
 	var vertical_speed := body.velocity.y
-	var rising := vertical_speed < 0.0
 	var next_vertical_speed := vertical_speed
 	if gravity_after_motion:
 		next_vertical_speed = vertical_movement.prepare_step(motion_values, delta)
@@ -233,8 +232,12 @@ func move_body(gravity_after_motion: bool = false) -> bool:
 		stomp_chain = 0
 	if gravity_after_motion:
 		vertical_movement.finish_step_on_support(motion_values, next_vertical_speed, supported)
-	var hidden_hit := rising and bonk_action.deliver_hidden(self, previous_position)
-	if rising and (hidden_hit or bonk_action.check_ceiling(self, previous_position, intended_motion)):
+	return _resolve_head_motion(previous_position, intended_motion, vertical_speed < 0.0)
+
+
+func _resolve_head_motion(before: Vector2, motion: Vector2, rising: bool) -> bool:
+	var hidden_hit := rising and bonk_action.deliver_hidden(self, before)
+	if rising and (hidden_hit or bonk_action.check_ceiling(self, before, motion)):
 		respond_to_ceiling()
 		return true
 	return false
@@ -244,11 +247,13 @@ func _sweep_motion(delta: float, vertical_speed: float) -> void:
 	_sweep_body(delta, vertical_speed, true)
 
 
-func _sweep_body(delta: float, vertical_speed: float, correct_landing: bool) -> void:
+func _sweep_body(
+	delta: float, vertical_speed: float, correct_landing: bool, correct_head: bool = true
+) -> void:
 	var previous_position := body.global_position
 	var horizontal_speed := body.velocity.x
 	var corrected_landing := false
-	if correct_landing or vertical_speed < 0.0:
+	if correct_landing or (correct_head and vertical_speed < 0.0):
 		corrected_landing = corner_correction.prepare(body, collision_shape, delta, vertical_speed)
 	var intended_x := horizontal_speed * delta
 	var prepared_x := body.global_position.x - previous_position.x
@@ -292,6 +297,10 @@ func respond_to_ceiling() -> void:
 	# Shatter itself has no bump pulse; a subsequent solid marker contact does.
 	if bonk_action.suppress_ceiling_sound:
 		return
+	_play_ceiling_bump()
+
+
+func _play_ceiling_bump() -> void:
 	var sound := ceiling_bump_sound
 	if sound is AudioStreamWAV:
 		# One-shot playback without trusting embedded WAV loop metadata.

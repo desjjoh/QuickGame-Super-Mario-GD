@@ -69,6 +69,12 @@ texture = ExtResource("sky_art")
 4:0/0 = 0
 4:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
 
+[sub_resource type="TileSetAtlasSource" id="reef_ground"]
+resource_name = "Reef"
+texture = ExtResource("art_1")
+3:1/0 = 0
+3:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+
 [resource]
 physics_layer_0/collision_layer = 1
 sources/0 = SubResource("Source_0")
@@ -76,3 +82,4 @@ sources/1 = SubResource("Source_1")
 sources/2 = SubResource("tree_tops")
 sources/3 = SubResource("spent_question_block")
 sources/4 = SubResource("cloud_ground")
+sources/5 = SubResource("reef_ground")

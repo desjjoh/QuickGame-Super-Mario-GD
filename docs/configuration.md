@@ -19,7 +19,11 @@ Select a `BaseLevelArea` and set its **Theme** to Overworld, Underground, Castle
 
 Set **Background Music** independently to Overworld, Underground, Castle, Coin Heaven, Underwater, or None. Overworld is the default. 1-1 uses Underground in its secret area.
 
-Under **Movement**, enable **Swimming Enabled** to use swim movement and bubbles. 2-2 enables it in MainArea. The player enters Swim after the arrival lock and resumes land movement after emerging in SurfaceArea.
+Under **Movement**, enable **Swimming Enabled** to use swim movement and bubbles. 2-2 enables it in MainArea. The player sinks during the underwater arrival lock, gains swim control when it ends, and resumes land movement after emerging in SurfaceArea.
+
+Place a `Whirlpool` scene anywhere under a swimming area to add a current. Its X position sets the left edge and **Width** sets the reach in pixels. The editor guide shows both edges and the center. The current spans the full water column, and the bottom input cutoff is measured from the area origin. Open `tests/fixtures/whirlpool_sandbox.tscn` to try the current in isolation.
+
+The underwater `GroundLayout` includes a solid **Reef** tile from the Pipes and Scenery atlas. In 2-2, the three currents begin at area-local X1040, X2080, and X2496 and span 96, 160, and 128 pixels respectively.
 
 Set **Transport Points** and **Pipe Routes** on the source area to link placed pipes to explicit area and destination IDs. A destination pipe supplies its exit pose. The reserved `player_spawn` target returns to the main area’s spawn. Standalone arrival markers are useful where an area needs a separate landing point.
 

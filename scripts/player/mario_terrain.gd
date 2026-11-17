@@ -147,6 +147,52 @@ func collect_coins(player: BasePlayer, short_profile: bool) -> void:
 				return  # PlayerBGCollision awards at most one touched coin per update.
 
 
+## The water head probe samples the center at the post-move integer coordinates.
+func swim_head_hits(player: Mario) -> bool:
+	var area := BaseLevel.containing(player).active_area
+	var feet := player.body.global_position - area.global_position
+	var raw_y := roundi(feet.y) - 32
+	var short_profile := (
+		not player.form_controller.current_form.can_crouch or player.form_controller.is_crouched
+	)
+	var minimum_y := 16 if short_profile else 32
+	if raw_y < minimum_y or raw_y >= 207 or (raw_y & 15) < 4:
+		return false
+	var query := PhysicsPointQueryParameters2D.new()
+	query.position = (
+		area.global_position + Vector2(floorf(feet.x + PROBE_EPSILON), raw_y)
+		+ Vector2(PROBE_EPSILON, (18.0 if short_profile else 2.0) + PROBE_EPSILON)
+	)
+	query.collision_mask = player.body.collision_mask
+	query.exclude = [player.body.get_rid()]
+	return not _terrain_at(player, query).is_empty()
+
+
+## Report the first solid metatile touched, in the NES left-then-right order.
+func swim_wall_direction(player: Mario) -> int:
+	var origin := BaseLevel.containing(player).active_area.global_position
+	var feet := player.body.global_position - origin
+	var raw_y := roundi(feet.y) - 32
+	if raw_y < 8 or raw_y >= 207:
+		return 0
+	var query := PhysicsPointQueryParameters2D.new()
+	query.collision_mask = player.body.collision_mask
+	query.exclude = [player.body.get_rid()]
+	var standing := (
+		player.form_controller.current_form.can_crouch and not player.form_controller.is_crouched
+	)
+	var probe_heights := [-24, -8] if standing and raw_y >= 32 else [-8]
+	var grid_feet := origin + Vector2(floorf(feet.x + PROBE_EPSILON), roundf(feet.y))
+	for direction: int in [-1, 1]:
+		var x := -6 if direction < 0 else 5
+		for height: int in probe_heights:
+			query.position = grid_feet + Vector2(x, height) + Vector2.ONE * PROBE_EPSILON
+			for hit in _terrain_at(player, query):
+				if hit.collider is TileMapLayer:
+					return direction
+	return 0
+
+
 func resolve(player: BasePlayer, before: Vector2, was_rising: bool, crouched: bool) -> void:
 	if player.body.collision_mask == 0:
 		return

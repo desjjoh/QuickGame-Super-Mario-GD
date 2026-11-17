@@ -16,7 +16,7 @@ func _ready() -> void:
 	process_physics_priority = 200
 	await _check_route(GameHandler.PlayerCharacter.MARIO, MARIO)
 	await _check_route(GameHandler.PlayerCharacter.LUIGI, LUIGI)
-	print("PASS: Mario and Luigi enter Swim after 2-2 arrival, then emerge and jump on land.")
+	print("PASS: Mario and Luigi sink during the 2-2 arrival lock, then swim, emerge, and jump on land.")
 	await preload("res://tests/fixtures/finish_test.gd").finish(get_tree())
 
 
@@ -49,15 +49,24 @@ func _check_route(character: GameHandler.PlayerCharacter, player_path: String) -
 	var arrival := water.get_node("Arrival") as AreaEndpoint
 	var bubbles := water.get_node("WorldObjects/SwimBubbles") as SwimBubbleEmitter
 	assert(player.arrival_control_ticks_remaining == BasePlayer.ARRIVAL_CONTROL_TICKS)
+	Input.action_press(ControllerHandler.right_action)
+	Input.action_press(ControllerHandler.primary_action)
+	var previous_y := arrival.global_position.y
+	var sank_during_lock := false
 	for frame in range(180):
 		if player.arrival_control_ticks_remaining == 0:
 			break
 		assert(not player.can_read_controller_input())
-		assert(not player.state_machine.current_state is MarioSwimState)
-		assert(player.body.global_position == arrival.global_position)
+		var position := player.body.global_position
+		assert(is_equal_approx(position.x, arrival.global_position.x))
+		assert(position.y >= previous_y)
+		sank_during_lock = sank_during_lock or position.y > previous_y
+		previous_y = position.y
 		assert(bubbles._spawn_ticks == 0)
 		await tick_finished
-	assert(player.arrival_control_ticks_remaining == 0)
+	Input.action_release(ControllerHandler.right_action)
+	Input.action_release(ControllerHandler.primary_action)
+	assert(sank_during_lock and player.arrival_control_ticks_remaining == 0)
 	for frame in range(4):
 		if player.state_machine.current_state is MarioSwimState:
 			break

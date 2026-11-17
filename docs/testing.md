@@ -60,6 +60,7 @@ Activity tests check both suspension orders, preservation of collision/state, pr
 ## Movement, contact, and rewards
 
 - `swimming_test` replays 17 Mesen traces for both Mario and Luigi in the isolated `tests/fixtures/swim_sandbox.tscn`. It checks per-tick position, speed, stroke timing, seabed movement, and the surface limit. It also checks facing through reversals and swim pose cadence across Small, Super, and Fire. Open the sandbox directly to try the shared Swim state.
+- `whirlpool_test` compares the sideways and vertical pull against 2,990 Mesen frames from the first 2-2 current. Ten input replays check tap and hold strokes, strokes on entry, both escape directions, delayed strokes, and the raw Y207/Y208 input boundary in the whirlpool sandbox.
 - `swimming_area_test` checks the 2-2 opening, underwater arrival lock, bubbles, and surface pipe exit for Mario and Luigi. It verifies that a fresh Jump uses land movement after emergence.
 - `swimming_bubble_test` replays 355 Mesen ticks in the swim sandbox and checks the shared spawn timer, both facings, fractional rise, reuse of all three slots, HUD cutoff, and pause.
 - `jump_benchmark_test` checks six takeoff positions, launch displacement/speed, exact 83-pixel logical rise from the rounded takeoff baseline, and expected reach/miss outcomes.

@@ -4,12 +4,20 @@ extends PlayerState
 const MOTION_PROFILE := &"swim"
 const STROKE_TICKS := 32
 # Convert the NES actor Y threshold of 20 to the player body's feet origin.
-const SURFACE_FEET_Y := 52.0
+const NES_FEET_OFFSET := 32
+const SURFACE_FEET_Y := NES_FEET_OFFSET + 20.0
+const INPUT_CUTOFF_Y := NES_FEET_OFFSET + 208
 const STROKE_FORCE := 0x0d
 const SINK_FORCE := 0x0a
+const WHIRLPOOL_STROKE_FORCE := 0x04
+const WHIRLPOOL_SINK_FORCE := 0x09
 const SURFACE_FORCE := 0x18
 const HORIZONTAL_FORCE := 0x98
 
+var _area: BaseLevelArea
+var _in_whirlpool := false
+var _blocked_direction := 0
+var _sink_force := SINK_FORCE
 var _stroke_ticks := 0
 var _stroke_origin_y := 0.0
 var _previous_jump := false
@@ -21,7 +29,11 @@ var _surface_y := SURFACE_FEET_Y
 func enter() -> void:
 	var player := get_player()
 	var level := BaseLevel.containing(player)
-	_surface_y = level.active_area.global_position.y + SURFACE_FEET_Y
+	_area = level.active_area
+	_surface_y = _area.global_position.y + SURFACE_FEET_Y
+	_in_whirlpool = false
+	_blocked_direction = 0
+	_sink_force = SINK_FORCE
 	_stroke_ticks = 0
 	_stroke_origin_y = player.body.global_position.y
 	_previous_jump = false
@@ -32,6 +44,13 @@ func enter() -> void:
 
 func exit() -> void:
 	get_player().motion_values.remove_modifier(MOTION_PROFILE)
+
+
+func accepts_depth_input() -> bool:
+	if not is_instance_valid(_area):
+		return true
+	var feet_y := roundi(get_player().body.global_position.y - _area.global_position.y)
+	return feet_y >= NES_FEET_OFFSET and feet_y < INPUT_CUTOFF_Y
 
 
 func process_physics(delta: float) -> BaseState:
@@ -49,9 +68,13 @@ func process_physics(delta: float) -> BaseState:
 	):
 		_stroke_ticks = STROKE_TICKS
 		_stroke_origin_y = player.body.global_position.y
-		_vertical_force = STROKE_FORCE
+		_vertical_force = WHIRLPOOL_STROKE_FORCE if _in_whirlpool else STROKE_FORCE
+		_sink_force = WHIRLPOOL_SINK_FORCE if _in_whirlpool else SINK_FORCE
 		player.vertical_movement.reset_fraction()
-		player.body.velocity.y = 30.0 if near_surface else -90.0
+		if _in_whirlpool:
+			player.body.velocity.y = 0.0 if near_surface else -60.0
+		else:
+			player.body.velocity.y = 30.0 if near_surface else -90.0
 		player.play_sound_effect(SoundHandler.get_sound(&"stomp"))
 		grounded = false
 	if not grounded:
@@ -62,7 +85,7 @@ func process_physics(delta: float) -> BaseState:
 				and _stroke_origin_y - player.body.global_position.y >= 1.0
 			)
 		):
-			_vertical_force = SINK_FORCE
+			_vertical_force = _sink_force
 		if near_surface:
 			_vertical_force = SURFACE_FORCE
 		player.motion_values.set_modifier(
@@ -72,11 +95,12 @@ func process_physics(delta: float) -> BaseState:
 		)
 	_previous_jump = jump
 	_move(player, grounded, direction, delta)
+	_apply_whirlpool(player)
 	_update_pose(player, direction, jump, previous_speed)
 	return null
 
 
-func _move(player: BasePlayer, grounded: bool, direction: int, delta: float) -> void:
+func _move(player: Mario, grounded: bool, direction: int, delta: float) -> void:
 	var body := player.body
 	var facing := -1 if player.sprite.flip_h else 1
 	var force := HORIZONTAL_FORCE if facing == _moving_direction else HORIZONTAL_FORCE * 2
@@ -85,20 +109,45 @@ func _move(player: BasePlayer, grounded: bool, direction: int, delta: float) -> 
 		_moving_direction = facing
 		body.velocity.x = 0.0
 		player.horizontal_movement.reset_fractional_step(false)
-	var acceleration_direction := direction
-	if grounded and direction == 0:
+	var acceleration_direction := 0 if direction == _blocked_direction else direction
+	if acceleration_direction == 0 and (grounded or direction != 0):
 		acceleration_direction = -int(signf(body.velocity.x))
 	var limit := 0x10 if grounded else 0x18
 	var speed := player.horizontal_movement.prepare_fractional_step(
 		body, acceleration_direction, force, limit, delta
 	)
-	var target_x := body.global_position.x + body.velocity.x * delta
+	var start_x := body.global_position.x
+	var attempted_x := body.velocity.x * delta
+	var target_x := start_x + attempted_x
+	var correction_before_move := player.camera_correction_x
 	player.face_direction(direction)
 	player.move_body(not grounded)
 	if absf(body.global_position.x - target_x) < 0.5:
 		body.velocity.x = speed
 	if not is_zero_approx(body.velocity.x):
 		_moving_direction = int(signf(body.velocity.x))
+	_blocked_direction = player.terrain.swim_wall_direction(player)
+	# The bit blocks steering even when Mario is already moving away from this wall.
+	if _blocked_direction != 0 and body.velocity.x * _blocked_direction >= 0.0:
+		body.velocity.x = 0.0
+		body.global_position.x -= _blocked_direction
+		# Count only attempted movement that survives the wall response.
+		var resolved_x := body.global_position.x - start_x
+		var accepted_x := clampf(resolved_x, minf(0.0, attempted_x), maxf(0.0, attempted_x))
+		player.camera_correction_x = correction_before_move + resolved_x - accepted_x
+
+
+func _apply_whirlpool(player: Mario) -> void:
+	_in_whirlpool = false
+	for candidate in player.get_tree().get_nodes_in_group(Whirlpool.GROUP):
+		var whirlpool := candidate as Whirlpool
+		if (
+			_area.is_ancestor_of(whirlpool)
+			and whirlpool.contains_player_x(player.body.global_position.x)
+		):
+			whirlpool.pull(player, GameHandler.animation_clock.tick_count, _blocked_direction != 1)
+			_in_whirlpool = true
+			return
 
 
 func _update_pose(player: Mario, direction: int, jump: bool, previous_speed: float) -> void:

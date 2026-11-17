@@ -133,6 +133,13 @@ func _area_uses_swimming() -> bool:
 	return level != null and level.active_area != null and level.active_area.swimming_enabled
 
 
+func can_read_controller_input() -> bool:
+	if not super.can_read_controller_input():
+		return false
+	var swim := state_machine.current_state as MarioSwimState
+	return swim == null or swim.accepts_depth_input()
+
+
 func _physics_process(delta: float) -> void:
 	if form_presentation.blocks_actor_motion():
 		_throw_pose.clear()
@@ -144,10 +151,7 @@ func _physics_process(delta: float) -> void:
 		and not scripted_motion_step.is_valid()
 		and _area_uses_swimming()
 	):
-		if arrival_control_ticks_remaining > 0:
-			# Leave the player at Arrival while the shared lock counts down.
-			_advance_arrival_control_lock()
-			return
+		# Swim integrates passive motion while the arrival lock filters controller input.
 		state_machine.change_state(state_machine.get_state(&"Swim"))
 	walk_animation.tick()
 	var grounded := has_floor_support()
@@ -227,9 +231,18 @@ func move_body(gravity_after_motion: bool = false) -> bool:
 	var before := body.global_position
 	var rising := body.velocity.y < 0.0
 	var ceiling_handled := super.move_body(gravity_after_motion)
-	if form_controller.current_form.can_crouch and not is_dead:
+	if (
+		form_controller.current_form.can_crouch
+		and not is_dead
+		and not state_machine.current_state is MarioSwimState
+	):
 		var before_correction_x := body.global_position.x
-		terrain.resolve(self, before, rising and not ceiling_handled, form_controller.is_crouched)
+		terrain.resolve(
+			self,
+			before,
+			rising and not ceiling_handled,
+			form_controller.is_crouched,
+		)
 		camera_correction_x += body.global_position.x - before_correction_x
 	terrain.collect_coins(
 		self, not form_controller.current_form.can_crouch or form_controller.is_crouched
@@ -237,6 +250,16 @@ func move_body(gravity_after_motion: bool = false) -> bool:
 	if _uses_floor_probes():
 		_floor_position = body.global_position
 	return ceiling_handled
+
+
+func _resolve_head_motion(before: Vector2, motion: Vector2, rising: bool) -> bool:
+	if not state_machine.current_state is MarioSwimState or not _uses_floor_probes():
+		return super._resolve_head_motion(before, motion, rising)
+	if body.velocity.y >= 0.0 or not terrain.swim_head_hits(self):
+		return false
+	body.velocity.y = vertical_movement.speed_with_integer(motion_values, 1)
+	_play_ceiling_bump()
+	return true
 
 
 func has_floor_support() -> bool:
@@ -298,11 +321,29 @@ func _sweep_motion(delta: float, vertical_speed: float) -> void:
 		step = terrain.step_floor(self, delta)
 	_floor_supported = step == MarioTerrain.FloorStep.LAND
 	if step == MarioTerrain.FloorStep.SWEEP:
-		_sweep_body(delta, vertical_speed, false)
+		var swimming := state_machine.current_state is MarioSwimState
+		var target := body.global_position + body.velocity * delta
+		var previous_correction_x := camera_correction_x
+		_sweep_body(delta, vertical_speed, false, not swimming)
+		if swimming:
+			if body.is_on_ceiling() and not body.is_on_floor():
+				body.global_position.y = target.y
+			if not _has_entity_side_contact():
+				# Metatile probes own swim walls. Entity walls still provide physical pipe contact.
+				body.global_position.x = target.x
+				camera_correction_x = previous_correction_x
 		_floor_supported = vertical_speed >= 0.0 and terrain.supports_body(body)
 		if _floor_supported:
 			body.apply_floor_snap()
 	_floor_position = body.global_position
+
+
+func _has_entity_side_contact() -> bool:
+	for index in body.get_slide_collision_count():
+		var hit := body.get_slide_collision(index)
+		if absf(hit.get_normal().x) > 0.5 and not hit.get_collider() is TileMapLayer:
+			return true
+	return false
 
 
 func get_side_probe_heights() -> PackedFloat32Array:
