@@ -49,6 +49,8 @@
 
 [ext_resource type="TileSet" path="res://assets/tileset/underwater/entity_layout.tres" id="entity_layout"]
 
+[ext_resource type="Texture2D" path="res://assets/palettes/underwater/interactibles/items/alternate_coins.tres" id="alternate_coins"]
+
 [resource]
 script = ExtResource("theme")
 display_name = "Underwater"
@@ -58,6 +60,7 @@ decorations = ExtResource("decorations")
 entity_markers = ExtResource("entity_layout")
 enemy_markers = ExtResource("enemy_layout")
 texture_overrides = Dictionary[String, Texture2D]({
+"res://assets/palettes/overworld/interactibles/items/alternate_coins.tres": ExtResource("alternate_coins"),
 "res://assets/palettes/overworld/enemies/green-cheep.png": ExtResource("enemies_green_cheep"),
 "res://assets/palettes/overworld/enemies/blooper.png": ExtResource("enemies_blooper"),
 "res://assets/palettes/overworld/enemies/bowser.png": ExtResource("enemies_bowser"),

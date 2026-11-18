@@ -1,5 +1,6 @@
 extends Node
 const COIN := preload("res://scenes/entities/coin/coin.tscn")
+const ALTERNATE_COIN := preload("res://scenes/entities/coin/alternate_coin.tscn")
 var mario: Mario
 
 
@@ -16,8 +17,8 @@ func sample() -> void:
 	)
 
 
-func make_coin(at: Vector2) -> WorldCoin:
-	var coin := COIN.instantiate() as WorldCoin
+func make_coin(at: Vector2, scene: PackedScene = COIN) -> WorldCoin:
+	var coin := scene.instantiate() as WorldCoin
 	coin.position = at
 	add_child(coin)
 	return coin
@@ -87,7 +88,7 @@ func _ready() -> void:
 	upper.free()
 	lower.free()
 	# Preserve consumed-state persistence and forbid suspended/dead/pipe pickups.
-	var blocked := make_coin(Vector2(120, 172))
+	var blocked := make_coin(Vector2(120, 172), ALTERNATE_COIN)
 	await ticks(2)
 	blocked.set_gameplay_suspended(true)
 	sample()
@@ -110,7 +111,7 @@ func _ready() -> void:
 	sample()
 	assert(GameHandler.player_status.coins == 0 and GameHandler.player_status.lives == lives + 1)
 	assert(GameHandler.player_status.score == score + 200)
-	var restored := COIN.instantiate() as WorldCoin
+	var restored := ALTERNATE_COIN.instantiate() as WorldCoin
 	restored.restore_area_state(blocked.capture_area_state())
 	restored.position = blocked.position
 	add_child(restored)

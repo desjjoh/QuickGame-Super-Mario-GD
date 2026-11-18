@@ -77,6 +77,10 @@ func _check_route(
 
 	# Settle on the exit shelf before pressing Right into the pipe.
 	var pipe := water.find_transport_entity(&"surface_entrance") as PipeEntrance
+	var shape := pipe.get_node("Body/CollisionShape2D") as CollisionShape2D
+	assert((shape.shape as RectangleShape2D).size == Vector2(16, 32))
+	assert(water.to_local(pipe.entry_position()) == Vector2(3018, 144))
+	assert((pipe.sprite.texture as AtlasTexture).region == Rect2(96, 32, 16, 32))
 	player.body.global_position = pipe.entry_position() - Vector2(6, 2)
 	player.body.velocity = Vector2.ZERO
 	player.horizontal_movement.reset_fractional_step()
@@ -242,6 +246,9 @@ func _check_cheep_cheep_stream(
 	assert(stream.get_child_count() == 1 and stream.get_child(0) == last)
 	assert(last.body.global_position.x < start_x)
 
+	# The exit check repositions Mario into the stream's last fish lanes.
+	last.queue_free()
+	await get_tree().process_frame
 	camera.follow_enabled = true
 	player.set_physics_process(true)
 

@@ -48,10 +48,11 @@ func _ready() -> void:
 	assert(is_instance_valid(level) and GameHandler.player_status.lives == 0)
 	await _check_1_2(game)
 	await _check_1_3(game)
+	await _check_2_2(game)
 	game.free()
 	await tick_finished
 	print(
-		"PASS: 1-1 through 1-3 halfway thresholds, left limits, repeat deaths, and side-area framing."
+		"PASS: World 1 and 2-2 halfway thresholds, left limits, repeat deaths, and side-area framing."
 	)
 	await preload("res://tests/fixtures/finish_test.gd").finish(get_tree())
 
@@ -135,6 +136,44 @@ func _check_1_2(game: Node) -> void:
 	assert(level.entry_mode == BaseLevel.EntryMode.HALFWAY_RESPAWN)
 	assert(GameHandler.player_status.lives == 0)
 	definition.stages[0].minimum_frames = card_frames
+
+
+func _check_2_2(game: Node) -> void:
+	GameHandler.set_lives(4)
+	assert(GameHandler.load_level(game.stages[5], true, 5, BaseLevel.EntryMode.RESPAWN))
+	var level := await _wait_for_level_start()
+	assert(level.stage_label == "2-2" and _spawn_matches(level, 48.0, 0.0))
+	var water := level.active_area
+	var origin_x := water.global_position.x
+	var camera := get_viewport().get_camera_2d() as LevelCamera
+	assert(camera.halfway_check_enabled and camera.halfway_camera_left == 1280.0)
+	assert(water.to_local(level.halfway_spawn.global_position) == Vector2(1328, 208))
+
+	_set_camera_left(origin_x + 1279.0)
+	level = await _restart(level, 48.0, 0.0)
+	assert(level.entry_mode == BaseLevel.EntryMode.RESPAWN)
+
+	_set_camera_left(origin_x + 1280.0)
+	level = await _restart(level, 1328.0, 1280.0)
+	assert(level.entry_mode == BaseLevel.EntryMode.HALFWAY_RESPAWN)
+	camera = get_viewport().get_camera_2d() as LevelCamera
+	assert(camera.scroll_left_limit == origin_x + 1280.0)
+	await tick_finished
+	assert(level.player.state_machine.current_state is MarioSwimState)
+	assert(level.player.can_read_controller_input())
+	for spawner_name in ["blooper_spawner_83_8", "blooper_spawner_94_3"]:
+		assert(level.world_objects.get_node(spawner_name).get_child_count() == 1)
+
+	level = await _restart(level, 1328.0, 1280.0)
+	var pipe := level.active_area.find_transport_entity(&"surface_entrance") as PipeEntrance
+	assert(level.transport(level.player, pipe.get_destination()))
+	for frame in range(240):
+		if level.active_area.area_id == &"surface" and level.can_transport():
+			break
+		await tick_finished
+	assert(level.active_area.area_id == &"surface")
+	level = await _restart(level, 1328.0, 1280.0)
+	assert(level.entry_mode == BaseLevel.EntryMode.HALFWAY_RESPAWN)
 
 
 func _find_1_2_triplet(level: BaseLevel) -> EntitySpawner:

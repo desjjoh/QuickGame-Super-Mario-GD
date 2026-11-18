@@ -115,6 +115,22 @@ margins = Vector2i(48, 32)
 0:0/0 = 0
 0:0/0/custom_data_0 = "hidden_question_block"
 
+[sub_resource type="TileSetAtlasSource" id="coin_alternate"]
+resource_name = "Coin Alt"
+texture = ExtResource("coin")
+margins = Vector2i(0, 48)
+0:0/0 = 0
+0:0/0/custom_data_0 = "coin_alternate"
+
+[sub_resource type="TileSetAtlasSource" id="short_sideways_pipe"]
+resource_name = "Sideways pipe entrance (1x2)"
+texture = ExtResource("3_alternate")
+margins = Vector2i(96, 32)
+0:0/size_in_atlas = Vector2i(1, 2)
+0:0/0 = 0
+0:0/0/texture_origin = Vector2i(0, -8)
+0:0/0/custom_data_0 = "short_sideways_pipe_entrance"
+
 [resource]
 custom_data_layer_0/name = "entity_id"
 custom_data_layer_0/type = 4
@@ -131,3 +147,5 @@ sources/12 = SubResource("reward_brick")
 sources/13 = SubResource("reward_brick_alternate")
 sources/15 = SubResource("castle_parts")
 sources/16 = SubResource("springboard")
+sources/17 = SubResource("coin_alternate")
+sources/18 = SubResource("short_sideways_pipe")

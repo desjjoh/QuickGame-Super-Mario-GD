@@ -42,6 +42,11 @@ func _ready() -> void:
 		print("SKIP RENDERED: climbing image")
 	# Rendered regression windows must not steal/drop focus during synthetic input.
 	get_window().unfocusable = true
+	# Connected controllers must not clear the fixture's scripted action presses.
+	for action in ["ui_up", "ui_down", "ui_left", "ui_right", "primary", "secondary"]:
+		for event in InputMap.action_get_events(action):
+			if event is InputEventJoypadMotion or event is InputEventJoypadButton:
+				InputMap.action_erase_event(action, event)
 	process_physics_priority = 200
 	var fixture := load("res://tests/fixtures/silent_level.tscn").instantiate() as BaseLevel
 	if "--super" in OS.get_cmdline_user_args():

@@ -25,7 +25,7 @@ Place a `Whirlpool` scene anywhere under a swimming area to add a current. Its X
 
 The underwater `GroundLayout` includes a solid **Reef** tile from the Pipes and Scenery atlas. In 2-2, the three currents begin at area-local X1040, X2080, and X2496 and span 96, 160, and 128 pixels respectively.
 
-Set **Transport Points** and **Pipe Routes** on the source area to link placed pipes to explicit area and destination IDs. A destination pipe supplies its exit pose. The reserved `player_spawn` target returns to the main area’s spawn. Standalone arrival markers are useful where an area needs a separate landing point.
+Set **Transport Points** and **Pipe Routes** on the source area to link placed pipes to explicit area and destination IDs. A destination pipe supplies its exit pose. Paint **Sideways Pipe Entrance (1×2)** for a one-tile-wide mouth, as used at the underwater exit in 2-2. The reserved `player_spawn` target returns to the main area’s spawn. Standalone arrival markers are useful where an area needs a separate landing point.
 
 Configure **Presentations → PipeOpening** with the intro area, painted castle cell, and the sideways pipe's **Entrance ID**. A fresh entry spawns at the castle doorway and walks into that pipe automatically. In 1-2, the pipe targets `main / arrival`, which uses **Areas → MainArea → Arrival**. Early deaths restart at **Players → PlayerSpawn**. Move each marker to set its placement independently.
 
@@ -64,7 +64,7 @@ Open `scenes/main/game.tscn`, select **Game**, and assign **Presentation → Tit
 
 Add a `Marker2D` under **Players** at the desired feet position and assign it to the level's **Death → Halfway Spawn** field. On **Areas → MainArea → Camera2D**, enable **Halfway Restart → Halfway Check Enabled** and set **Halfway Camera Left** in pixels from the main area's origin. The 2D editor draws a labeled dashed guide that moves with the area. At life loss, the active camera and the threshold are compared in world coordinates.
 
-1-1 uses a marker at `(1328, 208)` and a camera-left threshold of `1280`. 1-2 uses `(1584, 208)` and `1536`. 1-3 uses `(1072, 208)` and `1024`. These coordinates are relative to each stage's main area. At a halfway restart, the camera starts at the threshold and Mario's sprite starts 40 px from the left edge. Main-area deaths before the threshold use PlayerSpawn. Side-area deaths use the active camera's world position, so 1-1's authored secret room restarts at PlayerSpawn and 1-2's authored bonus room uses the halfway marker.
+1-1 uses a marker at `(1328, 208)` and a camera-left threshold of `1280`. 1-2 uses `(1584, 208)` and `1536`. 1-3 uses `(1072, 208)` and `1024`. 2-2 uses `(1328, 208)` and `1280`. These coordinates are relative to each stage's main area. At a halfway restart, the camera starts at the threshold and Mario's sprite starts 40 px from the left edge. Main-area deaths before the threshold use PlayerSpawn. Side-area deaths use the active camera's world position, so 1-1's authored secret room restarts at PlayerSpawn and 1-2's authored bonus room uses the halfway marker. 2-2 restarts underwater after losing a life on the surface.
 
 On the first main-area load of a halfway restart, EnemyLayout placements with a spawn trigger left of the last visible pixel are skipped for that area load. In 1-2 this skips the Goomba triplet near the checkpoint. Enemies with triggers at or beyond the right edge and occupants attached to pipes can spawn normally.
 
@@ -124,7 +124,11 @@ On a single lift, leave **Travel Distance** at −1 to use the original oscillat
 
 Set the single lift spawner to **Right on Landing** for a cloud platform. It waits at the marker, moves right at 1 px per tick after Mario lands, and keeps moving after he steps off. In 2-1, the medium platform is at (256, 160) in Coin Heaven.
 
-The 2D editor draws guides from the platform's left edge to its right edge at the travel limits. Vertical lifts show both sides of the travel lane. Single lifts mark the starting surface, and repeating lanes mark the starting surfaces from **Initial Offsets**. **Right on Landing** shows the direction of travel.
+The 2D editor draws guides from the platform's left edge to its right edge at the travel limits. Vertical lifts show both sides of the travel lane. Single lifts mark the starting surface, and repeating lanes mark the starting surfaces from **Initial Offsets**. **Right on Landing** shows the full starting surface and a rightward arrow that indicates one-way travel.
+
+## Paint world coins
+
+Paint **Coin** or **Coin Alt** on **EntityLayout**. **Coin Alt** uses the alternate frames from the area palette for colored backgrounds. Both use the same animation timing and pickup behavior. In 2-2, **Coin** matches the deep-blue water tiles. The underwater **Coin Alt** frames match the lighter blue.
 
 ## Configure a vine reward
 

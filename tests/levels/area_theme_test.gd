@@ -5,6 +5,8 @@ func _ready() -> void:
 	var castle := load("res://assets/themes/castle.tres") as AreaTheme
 	var underground := load("res://assets/themes/underground.tres") as AreaTheme
 	var overworld := load("res://assets/themes/overworld.tres") as AreaTheme
+	var underwater := load("res://assets/themes/underwater.tres") as AreaTheme
+	_check_variant_markers([overworld, underground, castle, underwater])
 	var preview := (
 		preload("res://scenes/levels/areas/base_area.tscn").instantiate() as BaseLevelArea
 	)
@@ -215,7 +217,7 @@ func _ready() -> void:
 	)
 	assert(main.theme.resolve_texture(original_texture) == original_texture)
 	# Every supplied counterpart is mapped, including all question animation frames.
-	assert(lower.theme.texture_overrides.size() == 33)
+	assert(lower.theme.texture_overrides.size() == 34)
 	for source_path: String in lower.theme.texture_overrides:
 		var replacement := lower.theme.resolve_texture(load(source_path))
 		assert(
@@ -326,3 +328,27 @@ func _ready() -> void:
 		"PASS: independent area themes, Underground terrain/decorations/pipes/question frames, artwork fallback, inherited bounce, resource isolation, and shutdown."
 	)
 	await preload("res://tests/fixtures/finish_test.gd").finish(get_tree())
+
+
+func _check_variant_markers(themes: Array[AreaTheme]) -> void:
+	var coin_scene := preload("res://scenes/entities/coin/alternate_coin.tscn")
+	var pipe_scene := preload("res://scenes/entities/pipes/short_sideways_pipe_entrance.tscn")
+	for theme in themes:
+		_check_variant_marker(theme, 17, "coin_alternate", coin_scene)
+		_check_variant_marker(theme, 18, "short_sideways_pipe_entrance", pipe_scene)
+
+
+func _check_variant_marker(
+	theme: AreaTheme, source_id: int, entity_id: String, scene: PackedScene
+) -> void:
+	var marker := theme.entity_markers.get_source(source_id) as TileSetAtlasSource
+	assert(marker.get_tile_data(Vector2i.ZERO, 0).get_custom_data("entity_id") == entity_id)
+	var entity := scene.instantiate() as BaseEntity
+	entity.visual_theme = theme
+	add_child(entity)
+	var art := entity.sprite.texture as AtlasTexture
+	var marker_region := marker.get_tile_texture_region(Vector2i.ZERO)
+	assert(art.atlas == marker.texture)
+	assert(art.region.position == Vector2(marker_region.position))
+	assert(entity.sprite.get_rect().size == Vector2(marker_region.size))
+	entity.free()

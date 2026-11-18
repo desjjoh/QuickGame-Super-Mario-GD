@@ -44,6 +44,8 @@
 [ext_resource type="Texture2D" uid="uid://clblmsvsl46nd" path="res://assets/palettes/underground/ui/start-cursor.png" id="title_cursor"]
 [ext_resource type="Texture2D" uid="uid://bs8mp6mky012v" path="res://assets/palettes/underground/interactibles/items/coins.tres" id="world_coin"]
 
+[ext_resource type="Texture2D" path="res://assets/palettes/underground/interactibles/items/alternate_coins.tres" id="alternate_coins"]
+
 [resource]
 script = ExtResource("1")
 display_name = "Underground"
@@ -53,6 +55,7 @@ decorations = ExtResource("3")
 entity_markers = ExtResource("4")
 enemy_markers = ExtResource("enemy_markers")
 texture_overrides = Dictionary[String, Texture2D]({
+"res://assets/palettes/overworld/interactibles/items/alternate_coins.tres": ExtResource("alternate_coins"),
 "res://assets/palettes/overworld/enemies/green-cheep.png": ExtResource("enemies_green_cheep"),
 "res://assets/palettes/overworld/enemies/blooper.png": ExtResource("enemies_blooper"),
 "res://assets/palettes/overworld/misc/vine.png": ExtResource("vine"),
