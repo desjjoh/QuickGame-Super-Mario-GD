@@ -7,6 +7,8 @@ const STEP := 1.0 / 60.0
 
 
 func _ready() -> void:
+	if DisplayServer.get_name() == "headless":
+		print("SKIP RENDERED: Starman palette and pose pixels")
 	var level := LEVEL.instantiate() as BaseLevel
 	add_child(level)
 	level.set_physics_process(false)

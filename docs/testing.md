@@ -18,7 +18,7 @@ For direct diagnosis:
 & 'C:/path/to/Godot_console.exe' --headless --path . res://tests/levels/transition_test.tscn --max-fps 60 --quit-after 1800
 ```
 
-Run tests for changed behavior and affected integrations. Omitting `-TestName` discovers every regression scene; use that only for an explicitly requested full-suite run. The full suite has not been requalified after the cleanup. `window_render_test` requires a display and explicitly skips headless execution; the current runner treats that skip as a failure because it requires PASS. Run rendered-only checks separately.
+Run tests for changed behavior and affected integrations. Omitting `-TestName` discovers every regression scene; use that only for an explicitly requested full-suite run. Rendered-only scenes report SKIP in the headless run. Scenes with headless assertions can pass and still report that their rendered checks or image captures were skipped. The summary counts both kinds of skip. A missing result, nonzero exit code, or engine error or warning fails the scene. Run the rendered checks separately.
 
 ## Rendered checks
 
@@ -62,7 +62,8 @@ Activity tests check both suspension orders, preservation of collision/state, pr
 - `swimming_test` replays 17 Mesen traces for both Mario and Luigi in the isolated `tests/fixtures/swim_sandbox.tscn`. It checks per-tick position, speed, stroke timing, seabed movement, and the surface limit. It also checks facing through reversals and swim pose cadence across Small, Super, and Fire. Open the sandbox directly to try the shared Swim state.
 - `whirlpool_test` compares the sideways and vertical pull against 2,990 Mesen frames from the first 2-2 current. Ten input replays check tap and hold strokes, strokes on entry, both escape directions, delayed strokes, and the raw Y207/Y208 input boundary in the whirlpool sandbox.
 - `blooper_test` paints a Blooper in the swim sandbox and compares its movement and knockout traces with Mesen. It checks the underwater atlas, both slot-turn rules, the fixed contact box, and the shared fireball, Starman, and player-damage paths.
-- `swimming_area_test` checks the 2-2 opening, underwater arrival lock, bubbles, and surface pipe exit for Mario and Luigi. It verifies that a fresh Jump uses land movement after emergence.
+- [Swimming Cheep Cheep test](../tests/enemies/swimming_cheep_cheep_test.tscn) compares 10 Mesen spawns and 1,100 movement ticks for both colors. It checks all eight spawn heights, cooldown and shared-slot contention, and third-slot bobbing in both directions. Open the [Cheep Cheep sandbox](../tests/fixtures/cheep_cheep_sandbox.tscn) and press F6 to play it in isolation.
+- `swimming_area_test` checks the 2-2 opening, underwater arrival lock, bubbles, and surface pipe exit for Mario and Luigi. It verifies that a fresh Jump uses land movement after emergence. The stage test also checks Cheep Cheep activation and cutoff at the traced camera positions, the first spawn location, and continued movement of fish after the cutoff.
 - `swimming_bubble_test` replays 355 Mesen ticks in the swim sandbox and checks the shared spawn timer, both facings, fractional rise, reuse of all three slots, HUD cutoff, and pause.
 - `jump_benchmark_test` checks six takeoff positions, launch displacement/speed, exact 83-pixel logical rise from the rounded takeoff baseline, and expected reach/miss outcomes.
 - `landing_rejump_test` compares 20 Small/Super, both-direction flat-ground cases with recorded reference data: immediate/delayed re-jumps, tapped/held Jump, contact-frame rejection, initial velocity, early horizontal samples, apex tolerance, and one integration per tick. It does not establish all-terrain parity or input buffering.

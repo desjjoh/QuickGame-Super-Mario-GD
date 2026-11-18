@@ -13,6 +13,8 @@ func ticks(count: int = 2) -> void:
 
 
 func _ready() -> void:
+	if DisplayServer.get_name() == "headless":
+		print("SKIP RENDERED: player status image")
 	GameHandler.clear_session()
 	GameHandler.set_top_score(43210)
 	var status := GameHandler.player_status

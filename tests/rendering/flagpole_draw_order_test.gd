@@ -5,7 +5,7 @@ const FINISH_TEST := preload("res://tests/fixtures/finish_test.gd")
 
 func _ready() -> void:
 	if DisplayServer.get_name() == "headless":
-		print("PASS: rendered flag draw-order check skipped in headless mode.")
+		print("SKIP: rendered window required")
 		await FINISH_TEST.finish(get_tree())
 		return
 	get_window().unfocusable = true

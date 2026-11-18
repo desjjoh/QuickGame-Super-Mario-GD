@@ -93,7 +93,7 @@ func sample(shot: Image, x: int, y: int) -> Color:
 
 func _ready() -> void:
 	if DisplayServer.get_name() == "headless":
-		print("window_render_test: SKIPPED (rendered window required)")
+		print("SKIP: rendered window required")
 		get_tree().quit()
 		return
 	var game := load("res://scenes/main/game.tscn").instantiate() as Node

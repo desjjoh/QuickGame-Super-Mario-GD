@@ -92,7 +92,7 @@ The game uses 256×240 logical framing with window-resolution canvas_items rende
 
 ## Source configuration and ownership
 
-`Game.stages` defines completion order and lists 1-1, 1-2, 1-3, and 1-4. Clearing the final registered stage returns to the title. **Game → Start Stage Override** selects the starting BaseLevel scene for new runs. Leave it empty to use the first entry. Selecting a registered scene starts at its position in the list. A scene outside the list returns to the title after ordinary completion. The title backdrop is configured separately. Single-stage test fixtures assign `game.stages.assign([scene])`.
+`Game.stages` defines completion order and lists 1-1, 1-2, 1-3, 1-4, 2-1, and 2-2. Clearing the final registered stage returns to the title. **Game → Start Stage Override** selects the starting BaseLevel scene for new runs. Leave it empty to use the first entry. Selecting a registered scene starts at its position in the list. A scene outside the list returns to the title after ordinary completion. The title backdrop is configured separately. Single-stage test fixtures assign `game.stages.assign([scene])`.
 
 Use typed GameHandler methods/properties and `player_status` for score, coins, lives, form, top score, stage label, and timer values. Generic `set_session_value()` / `get_session_value()` are for run metadata such as area/arrival IDs; reserved-key writes are rejected. The existing `session_value_changed` signal carries both typed-value and metadata notifications.
 
@@ -107,6 +107,8 @@ Paint **Red Parakoopa Spawner** on **EnemyLayout** to place a Red Koopa that fli
 Paint **Green Parakoopa Spawner** on **EnemyLayout** for the hopping variant. Each marker activates one enemy at that cell. The 2-1 markers are at (151, 12), (169, 12), and (171, 12).
 
 Paint **Blooper Spawner** on the underwater **EnemyLayout** at the intended start cell. Blooper starts eight pixels below the marker's top edge and uses the normal enemy slot limit. The slot determines whether a turn aims toward Mario or follows his movement direction.
+
+Instance [Swimming Cheep Cheep Spawner](../scenes/entities/spawners/swimming_cheep_cheep_spawner.tscn) under an underwater area's **WorldObjects**. The marker's X sets the camera's left-edge activation point. **Active Distance** limits how far the camera can travel while the stream is active. Leave it at 0 for a stream with no end marker. The spawner shares the first three enemy slots with other enemies and waits 32 physics ticks after each successful spawn. Both colors draw from the same eight spawn heights. Leave **Favor Red** off for World 2's color distribution. The editor draws labeled camera-left start and stop lines. In 2-2 they are at area-local X931 and X2723. Fish already spawned keep swimming past the stop line.
 
 ## Place moving lifts
 

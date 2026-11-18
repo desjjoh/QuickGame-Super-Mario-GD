@@ -44,6 +44,8 @@ func reference_blur(source: Image, point: Vector2, radius: float) -> float:
 
 
 func _ready() -> void:
+	if DisplayServer.get_name() == "headless":
+		print("SKIP RENDERED: shared shadow pixels")
 	var game_scene := load("res://scenes/main/game.tscn") as PackedScene
 	var game := game_scene.instantiate() as Node
 	game.shadow_shader_enabled = true

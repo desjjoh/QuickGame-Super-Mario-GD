@@ -9,6 +9,7 @@ extends EntityState
 @export var defeat_sprite_y_offset := 0.0
 
 var launch_speed_fraction := 0
+var launch_position_fraction := 0
 var launch_direction := 1.0
 var fireball_launch := false
 var star_launch := false
@@ -33,7 +34,7 @@ func enter() -> void:
 	if fireball_launch or star_launch:
 		_launch_hit_tick = Engine.get_physics_frames()
 		_speed_units = roundi(launch_speed / 60.0 * 256.0) + launch_speed_fraction
-		_position_fraction = 0
+		_position_fraction = launch_position_fraction
 		_sprite_anchor = entity.sprite.position
 		(entity as BaseEnemy).body.position.y -= 2.0
 		_advance_fractional_launch()

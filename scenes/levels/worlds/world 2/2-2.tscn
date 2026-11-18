@@ -1,6 +1,5 @@
 [gd_scene format=4 uid="uid://dgxctwwql0ow7"]
 
-[ext_resource type="Resource" uid="uid://vehrckrp5rsd" path="res://assets/player/forms/fire.tres" id="3_o7eio"]
 [ext_resource type="TileSet" uid="uid://3cgqvwhb2wes" path="res://assets/tileset/underwater/decorations.tres" id="4_bqvgl"]
 [ext_resource type="TileSet" uid="uid://bn717qg7qykwb" path="res://assets/tileset/underwater/terrain.tres" id="5_rs556"]
 [ext_resource type="TileSet" uid="uid://lovpm1s554gc" path="res://assets/tileset/underwater/entity_layout.tres" id="6_5ivol"]
@@ -19,6 +18,7 @@
 [ext_resource type="Script" uid="uid://bw6vhx3gvr1o" path="res://scripts/levels/transport_placement.gd" id="transport_placement"]
 [ext_resource type="Resource" path="res://assets/themes/underwater.tres" id="underwater"]
 [ext_resource type="PackedScene" path="res://scenes/entities/whirlpool/whirlpool.tscn" id="whirlpool"]
+[ext_resource type="PackedScene" path="res://scenes/entities/spawners/swimming_cheep_cheep_spawner.tscn" id="cheep_stream"]
 
 [sub_resource type="Resource" id="SurfaceDestination"]
 script = ExtResource("transport_destination")
@@ -56,7 +56,6 @@ ending_presentation = NodePath("Presentations/FlagpoleEnding")
 opening_presentation = NodePath("Presentations/PipeOpening")
 stage_label = "2-2"
 player_scene = ExtResource("player")
-player_start_configuration = ExtResource("3_o7eio")
 
 [node name="MainArea" parent="Areas" parent_id_path=PackedInt32Array(638828059) index="0" unique_id=250103957]
 process_physics_priority = 110
@@ -99,6 +98,10 @@ width = 160
 [node name="Whirlpool3" parent="Areas/MainArea/WorldObjects" parent_id_path=PackedInt32Array(250103957, 827174942) index="2" unique_id=605523351 instance=ExtResource("whirlpool")]
 position = Vector2(2496, 208)
 width = 128
+
+[node name="SwimmingCheepCheepSpawner" parent="Areas/MainArea/WorldObjects" parent_id_path=PackedInt32Array(250103957, 827174942) index="3" unique_id=1570392821 instance=ExtResource("cheep_stream")]
+position = Vector2(931, 0)
+active_distance = 1792.0
 
 [node name="Arrival" parent="Areas/MainArea" index="3" unique_id=1254188347]
 position = Vector2(48, 32)

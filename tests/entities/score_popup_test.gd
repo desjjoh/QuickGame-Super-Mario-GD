@@ -10,6 +10,8 @@ func _physics_process(_delta: float) -> void:
 
 
 func _ready() -> void:
+	if DisplayServer.get_name() == "headless":
+		print("SKIP RENDERED: score popup image")
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	# Sample after the popup's update even when one rendered frame runs several physics ticks.
 	process_physics_priority = 200

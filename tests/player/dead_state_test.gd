@@ -28,6 +28,8 @@ func make_game() -> Node:
 
 
 func _ready() -> void:
+	if DisplayServer.get_name() == "headless":
+		print("SKIP RENDERED: death pose image")
 	process_physics_priority = 200
 	for lower_area in [false, true]:
 		GameHandler.clear_session()

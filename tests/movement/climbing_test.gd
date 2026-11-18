@@ -38,6 +38,8 @@ func ticks(count: int = 1) -> void:
 
 
 func _ready() -> void:
+	if DisplayServer.get_name() == "headless":
+		print("SKIP RENDERED: climbing image")
 	# Rendered regression windows must not steal/drop focus during synthetic input.
 	get_window().unfocusable = true
 	process_physics_priority = 200

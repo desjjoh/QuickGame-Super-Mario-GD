@@ -83,6 +83,8 @@ const TRACE_SPEED := [
 
 
 func _ready() -> void:
+	if DisplayServer.get_name() == "headless":
+		print("SKIP RENDERED: Fire throw pose pixels")
 	if DisplayServer.get_name() != "headless":
 		await check_rendered_pose()
 		print("PASS: Rendered Fire throw pixels in both directions.")

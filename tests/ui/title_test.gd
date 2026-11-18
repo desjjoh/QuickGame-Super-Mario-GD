@@ -46,6 +46,8 @@ func start_button(pressed: bool) -> void:
 
 
 func _ready() -> void:
+	if DisplayServer.get_name() == "headless":
+		print("SKIP RENDERED: title screen images")
 	call_deferred("run_checks")
 
 
