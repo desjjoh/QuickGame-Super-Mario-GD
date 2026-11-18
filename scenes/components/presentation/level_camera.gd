@@ -4,6 +4,7 @@ extends Camera2D
 ## Called after player movement and before the level's screen-edge clamp.
 
 const LEFT_ARRIVAL_SPRITE_X := 56.0  # NES alternate pipe entrance X ($38).
+const EDITOR_GUIDE_LABEL_OFFSET := Vector2(4.0, 12.0)
 
 @export var follow_enabled: bool = true
 ## Horizontal camera limits measured from the parent area's origin.
@@ -95,7 +96,7 @@ func _draw() -> void:
 		draw_dashed_line(start, end, color, 1.0, 8.0)
 		draw_string(
 			font,
-			start + Vector2(4.0, 25.0),
+			start + EDITOR_GUIDE_LABEL_OFFSET,
 			"Halfway camera left: %s (area)" % halfway_camera_left,
 			HORIZONTAL_ALIGNMENT_LEFT,
 			-1,
@@ -114,7 +115,9 @@ func _draw() -> void:
 		draw_line(start, end, colors[index], -1.0)
 		var label := "Area %s: %s" % ["Left" if index == 0 else "Right", edges[index]]
 		var text_width := font.get_string_size(label, HORIZONTAL_ALIGNMENT_LEFT, -1, 10).x
-		var text_offset := Vector2(4.0 if index == 0 else -text_width - 4.0, 12.0)
+		var text_offset := EDITOR_GUIDE_LABEL_OFFSET
+		if index == 1:
+			text_offset.x = -text_width - text_offset.x
 		draw_string(
 			font, start + text_offset, label, HORIZONTAL_ALIGNMENT_LEFT, -1, 10, colors[index]
 		)

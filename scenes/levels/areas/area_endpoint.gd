@@ -14,6 +14,8 @@ enum ExitDirection { UP, DOWN, LEFT, RIGHT }
 @export_range(-1.0, 256.0, 1.0) var camera_sprite_x: float = -1.0
 ## Physics ticks before manual control resumes.
 @export_range(0, 120) var control_lock_ticks := BasePlayer.ARRIVAL_CONTROL_TICKS
+## Use the underwater entry drop and pause on the final arrival-lock tick.
+@export var swim_entry_drop := false
 ## Apply the re-entry spawn cutoff before activating the destination area.
 @export var skip_passed_enemies: bool = false
 

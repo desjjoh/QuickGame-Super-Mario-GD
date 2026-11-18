@@ -93,6 +93,8 @@ func sample(shot: Image, x: int, y: int) -> Color:
 
 
 func _ready() -> void:
+	if DisplayServer.get_name() == "headless":
+		print("SKIP RENDERED: shadow style pixels")
 	var level_scene := load("res://tests/fixtures/sandbox_level.tscn") as PackedScene
 	var standalone := level_scene.instantiate() as BaseLevel
 	add_child(standalone)

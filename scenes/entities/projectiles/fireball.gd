@@ -76,7 +76,7 @@ func advance() -> void:
 		else:
 			sprite.texture = BURST
 			sprite.hframes = 3
-			sprite.position = Vector2(-4, -4)
+			sprite.position = Vector2(-4, -3)
 			sprite.frame = (burst_tick - 1) >> 1
 		return
 	var step := _position_fraction + _speed

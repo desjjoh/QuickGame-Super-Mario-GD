@@ -1,6 +1,6 @@
 extends EntityState
 
-const OSCILLATION := preload("res://scenes/components/motion/vertical_oscillation.gd")
+const OSCILLATION := preload("res://scenes/entities/enemies/koopa/red_parakoopa_motion.gd")
 const FIRST_WING_FRAME := 2
 
 var _motion: OSCILLATION
@@ -17,9 +17,8 @@ func enter() -> void:
 		ancestor = ancestor.get_parent()
 	var area := ancestor as BaseLevelArea
 	var area_y := area.global_position.y if area != null else 0.0
-	var reference_y := posmod(roundi(_origin_y - area_y) - 16, 256)
-	_center_y = 48 if reference_y < 128 else -32
-	_motion = OSCILLATION.new(3, 6, 2)
+	_center_y = OSCILLATION.center_for(_origin_y - area_y)
+	_motion = OSCILLATION.new()
 	_update_wings(GameHandler.animation_clock.tick_count)
 
 

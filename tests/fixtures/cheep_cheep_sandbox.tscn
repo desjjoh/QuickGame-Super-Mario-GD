@@ -1,0 +1,10 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://tests/fixtures/swim_sandbox.tscn" id="sandbox"]
+[ext_resource type="PackedScene" path="res://scenes/entities/spawners/swimming_cheep_cheep_spawner.tscn" id="spawner"]
+
+[node name="CheepCheepSandbox" instance=ExtResource("sandbox")]
+
+[node name="SwimmingCheepCheepSpawner" parent="Areas/MainArea/WorldObjects" instance=ExtResource("spawner")]
+
+[editable path="Areas/MainArea"]

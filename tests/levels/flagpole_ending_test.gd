@@ -71,6 +71,8 @@ func grab(level: BaseLevel, height: float = 100.0) -> void:
 
 
 func _ready() -> void:
+	if DisplayServer.get_name() == "headless":
+		print("SKIP RENDERED: flagpole ending images")
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	process_physics_priority = 200
 	for boundary in [[16, 100, 400], [56, 400, 800], [80, 800, 2000], [126, 2000, 5000]]:

@@ -58,6 +58,8 @@ func begin_final_death() -> void:
 
 
 func _ready() -> void:
+	if DisplayServer.get_name() == "headless":
+		print("SKIP RENDERED: game-over image")
 	GameHandler.clear_session()
 	assert(
 		GameHandler.player_status.lives == 2 and GameHandler.player_status.get_display_lives() == 3

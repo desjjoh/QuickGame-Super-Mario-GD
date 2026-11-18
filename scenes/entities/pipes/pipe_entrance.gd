@@ -1,6 +1,6 @@
 class_name PipeEntrance
 extends TransportEntity
-## Shared upright and left-facing 2x2 pipe entrance.
+## Shared logic for upright and left-facing pipes.
 
 const UPRIGHT_MOUTH := Vector2(16, 0)
 const SPAWNER := preload("res://scenes/entities/spawners/pipe_occupant_spawner.tscn")

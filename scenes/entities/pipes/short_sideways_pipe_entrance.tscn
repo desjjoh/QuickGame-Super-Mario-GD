@@ -1,0 +1,34 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/entities/base/base_entity.tscn" id="base"]
+[ext_resource type="Script" path="res://scenes/entities/pipes/pipe_entrance.gd" id="pipe"]
+[ext_resource type="Texture2D" path="res://assets/palettes/overworld/tileset/Palette 1 (Ground and Stone).png" id="ground_art"]
+
+[sub_resource type="AtlasTexture" id="mouth_art"]
+atlas = ExtResource("ground_art")
+region = Rect2(96, 32, 16, 32)
+filter_clip = true
+
+[sub_resource type="RectangleShape2D" id="shape"]
+size = Vector2(16, 32)
+
+[node name="ShortSidewaysPipeEntrance" node_paths=PackedStringArray("sprite") instance=ExtResource("base")]
+script = ExtResource("pipe")
+controller_input_enabled = true
+texture_filter = 1
+sprite = NodePath("Presentation/Mouth")
+sideways = true
+destination_area_id = &"main"
+destination_endpoint_id = &"player_spawn"
+
+[node name="Presentation" type="Node2D" parent="."]
+
+[node name="Mouth" type="Sprite2D" parent="Presentation"]
+position = Vector2(8, 16)
+texture = SubResource("mouth_art")
+
+[node name="Body" type="StaticBody2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Body"]
+position = Vector2(8, 16)
+shape = SubResource("shape")

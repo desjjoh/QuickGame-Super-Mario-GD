@@ -1,0 +1,9 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/entities/coin/coin.tscn" id="base"]
+[ext_resource type="Texture2D" path="res://assets/palettes/overworld/interactibles/items/alternate_coins.tres" id="art"]
+
+[node name="AlternateCoin" instance=ExtResource("base")]
+
+[node name="Sprite2D" parent="Body" index="0"]
+texture = ExtResource("art")

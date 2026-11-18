@@ -1,8 +1,8 @@
-[gd_resource type="TileSet" format=3]
+[gd_resource type="TileSet" format=3 uid="uid://3cgqvwhb2wes"]
 
-[ext_resource type="Texture2D" path="res://assets/palettes/underwater/tileset/Palette 3 (Pipes and Scenery).png" id="art_1"]
-[ext_resource type="Texture2D" path="res://assets/palettes/underwater/tileset/Palette 2 (Water and Sky).png" id="art_2"]
-[ext_resource type="Texture2D" path="res://assets/palettes/underwater/tileset/Palette 1 (Ground and Stone).png" id="art_3"]
+[ext_resource type="Texture2D" uid="uid://dr7obflu2ti8r" path="res://assets/palettes/underwater/tileset/Palette 3 (Pipes and Scenery).png" id="art_1"]
+[ext_resource type="Texture2D" uid="uid://dgm1ux3gnt6uq" path="res://assets/palettes/underwater/tileset/Palette 2 (Water and Sky).png" id="art_2"]
+[ext_resource type="Texture2D" uid="uid://d2ol8ojjjavty" path="res://assets/palettes/underwater/tileset/Palette 1 (Ground and Stone).png" id="art_3"]
 
 [sub_resource type="TileSetAtlasSource" id="Source_0"]
 resource_name = "Bush parts"

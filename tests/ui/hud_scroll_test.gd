@@ -72,7 +72,8 @@ func _ready() -> void:
 	game.free()
 	await get_tree().process_frame
 	if DisplayServer.get_name() == "headless":
-		print("PASS: fixed screen-space HUD setup; rendered glyph checks skipped in headless mode.")
+		print("PASS: fixed screen-space HUD setup.")
+		print("SKIP RENDERED: HUD glyphs")
 		await FINISH_TEST.finish(get_tree())
 		return
 	print(

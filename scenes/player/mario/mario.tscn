@@ -28,6 +28,8 @@
 [ext_resource type="Script" uid="uid://67xtnb6cg7wx" path="res://scripts/player/mario_starman.gd" id="starman"]
 [ext_resource type="Script" uid="uid://dxqlyka8ckcep" path="res://scripts/player/fire_throw_pose.gd" id="throw_pose"]
 
+[ext_resource type="Script" path="res://scenes/player/mario/states/swim.gd" id="swim_state"]
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_small_mario"]
 size = Vector2(11, 14)
 
@@ -119,6 +121,11 @@ animation_name = &"climb"
 sprite_texture = ExtResource("climb_sprite")
 stop_animation_on_enter = true
 frame_updates_enabled = false
+
+[node name="Swim" type="Node" parent="StateMachine" index="7"]
+script = ExtResource("swim_state")
+stop_animation_on_enter = true
+sprite_frame = 0
 
 [node name="CollisionShape2D" parent="Body" index="0"]
 position = Vector2(-0.5, -7)

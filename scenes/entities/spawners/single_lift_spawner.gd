@@ -50,6 +50,18 @@ func _notification(what: int) -> void:
 func _draw() -> void:
 	if not Engine.is_editor_hint():
 		return
+	var width := platform_width * MovingLift.TILE_WIDTH
+	if axis == Axis.RIGHT_ON_LANDING:
+		PREVIEW.draw_surface(self, Vector2.ZERO, width)
+		var right_edge := Vector2(width, 0)
+		var tip := right_edge + Vector2(48, 0)
+		draw_line(right_edge, tip, PREVIEW.COLOR, 1.0)
+		draw_polyline(
+			PackedVector2Array([tip + Vector2(-6, -4), tip, tip + Vector2(-6, 4)]),
+			PREVIEW.COLOR,
+			1.0
+		)
+		return
 	var ancestor := get_parent()
 	while ancestor != null and not ancestor is BaseLevelArea:
 		ancestor = ancestor.get_parent()
@@ -57,14 +69,11 @@ func _draw() -> void:
 	var area_y := roundi(area.to_local(global_position).y) if area != null else roundi(position.y)
 	var span := _preview_span(area_y)
 	var travel_axis := Vector2.DOWN if axis == Axis.VERTICAL else Vector2.RIGHT
-	var width := platform_width * MovingLift.TILE_WIDTH
 	PREVIEW.draw_path(self, travel_axis * span.x, travel_axis * span.y, width)
 	PREVIEW.draw_surface(self, Vector2.ZERO, width)
 
 
 func _preview_span(area_y: int) -> Vector2i:
-	if axis == Axis.RIGHT_ON_LANDING:
-		return Vector2i(0, 96)
 	if travel_distance >= 0:
 		if axis == Axis.HORIZONTAL:
 			return Vector2i(-travel_distance, 0)

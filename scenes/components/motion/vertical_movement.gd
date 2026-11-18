@@ -46,23 +46,38 @@ func prepare_step(values: MotionValues, delta: float, grid_origin: float = 0.0) 
 	)
 	if not _fixed_step:
 		return speed_after_gravity(values, delta)
-	var current := values.velocity.y
+	var displacement := _advance(values.velocity.y, int(roundf(force)), int(roundf(values.max_fall_speed / 60.0)), false)
+	_target_y = grid_origin + roundf(values.body.global_position.y - grid_origin) + displacement
+	values.body.velocity.y = (_target_y - values.body.global_position.y) / delta
+	return _encoded_speed()
+
+
+## Apply a second NES integration step after the normal terrain pass.
+func apply_extra_step(values: MotionValues, force: int, limit: int) -> void:
+	values.body.global_position.y += _advance(values.velocity.y, force, limit, true)
+	var velocity := values.velocity
+	velocity.y = _encoded_speed()
+	values.velocity = velocity
+	_published = velocity.y
+
+
+func _advance(current: float, force: int, limit: int, check_fraction_byte: bool) -> int:
+	var units := integer_speed * 256 + speed_fraction
 	if is_nan(_published) or not is_equal_approx(current, _published):
-		var units := int(roundf(current / 60.0 * 256.0))
-		integer_speed = floori(units / 256.0)
-		speed_fraction = posmod(units, 256)
-	var displacement := consume_displacement(integer_speed * 256 + speed_fraction)
-	var next_units := integer_speed * 256 + speed_fraction + int(roundf(force))
-	var limit := int(roundf(values.max_fall_speed / 60.0))
-	# ImposeGravity allows the low half of the cap's fractional range.
-	if next_units >= limit * 256 + 128:
+		units = roundi(current / 60.0 * 256.0)
+	var displacement := consume_displacement(units)
+	var next_units := units + force
+	# ImposeGravity tests the integer byte and fractional high bit independently.
+	var cap_fraction := posmod(next_units, 256) if check_fraction_byte else next_units - limit * 256
+	if next_units >= limit * 256 and cap_fraction >= 128:
 		next_units = limit * 256
 	integer_speed = floori(next_units / 256.0)
 	speed_fraction = posmod(next_units, 256)
-	var next_speed := next_units / 256.0 * 60.0
-	_target_y = grid_origin + roundf(values.body.global_position.y - grid_origin) + displacement
-	values.body.velocity.y = (_target_y - values.body.global_position.y) / delta
-	return next_speed
+	return displacement
+
+
+func _encoded_speed() -> float:
+	return (integer_speed * 256 + speed_fraction) / 256.0 * 60.0
 
 
 func finish_step(values: MotionValues, next_speed: float) -> void:

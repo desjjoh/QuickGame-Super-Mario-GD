@@ -7,6 +7,8 @@ extends Resource
 @export var walk: Array[Texture2D] = []
 @export var skid: Texture2D
 @export var jump: Texture2D
+## Each stroke pose has a normal frame followed by its kick frame.
+@export var swim: Array[Texture2D] = []
 @export var crouch: Texture2D
 @export var climb: Array[Texture2D] = []
 @export var growth_intermediate: Texture2D

@@ -11,6 +11,8 @@ func frames() -> void:
 
 
 func _ready() -> void:
+	if DisplayServer.get_name() == "headless":
+		print("SKIP RENDERED: area background pixels")
 	var standalone := load("res://tests/fixtures/sandbox_level.tscn").instantiate() as BaseLevel
 	var preview_area := standalone.get_node("Areas/MainArea") as BaseLevelArea
 	preview_area.background_color = Color(0.125, 0.25, 0.5, 1)

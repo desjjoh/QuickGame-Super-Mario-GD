@@ -11,6 +11,8 @@ const THEME_PALETTES := {
 
 
 func _ready() -> void:
+	if DisplayServer.get_name() == "headless":
+		print("SKIP RENDERED: Fire form images")
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	ControllerHandler.set_physics_process(false)
 	GameHandler.animation_clock.set_physics_process(false)

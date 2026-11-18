@@ -125,15 +125,21 @@ func run_checks() -> void:
 						player.state_machine.current_state.name == trial.to,
 						label + " selected wrong state"
 					)
-					check(
-						absf(displacement.x - player.body.velocity.x / 60.0) < 0.05,
-						label + " skipped or doubled horizontal displacement"
-					)
+					var expected_step := player.body.velocity.x / 60.0
 					if trial.get("accelerate", false):
+						# These ground starts have zero position carry. The speed fraction
+						# can advance while the integer position step is still zero.
+						var speed_units := expected_step * 16.0
+						speed_units += player.horizontal_movement._speed_fraction / 256.0
 						check(
-							displacement.x * direction > 0.0,
+							speed_units * direction > 0.0,
 							label + " must accelerate on the first input tick"
 						)
+						expected_step = floorf(expected_step)
+					check(
+						absf(displacement.x - expected_step) < 0.05,
+						label + " skipped or doubled horizontal displacement"
+					)
 					if not trial.ground and not trial.get("land", false):
 						check(
 							displacement.y >= 0.0 and player.body.velocity.y > 0.0,

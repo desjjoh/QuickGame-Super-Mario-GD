@@ -35,6 +35,8 @@ func covered_operation(game: Node) -> bool:
 
 
 func _ready() -> void:
+	if DisplayServer.get_name() == "headless":
+		print("SKIP RENDERED: transition pixels")
 	var director: TransitionCoordinator = GameHandler.transitions
 	var area_definition := director.get_definition(&"area")
 	var level_definition := director.get_definition(&"level")

@@ -11,6 +11,8 @@ const FORMS := [
 
 
 func _ready() -> void:
+	if DisplayServer.get_name() == "headless":
+		print("SKIP RENDERED: Fire Flower image")
 	ControllerHandler.set_physics_process(false)
 	GameHandler.animation_clock.set_physics_process(false)
 	for is_luigi in [false, true]:

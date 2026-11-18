@@ -1,0 +1,62 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/entities/enemies/base/base_enemy.tscn" id="base"]
+[ext_resource type="Script" path="res://scenes/entities/enemies/cheep_cheep/swimming_cheep_cheep.gd" id="actor"]
+[ext_resource type="Script" path="res://scripts/states/enemies/enemy_defeated_state.gd" id="defeated"]
+[ext_resource type="Script" path="res://scenes/entities/base/states/entity_state.gd" id="swim"]
+[ext_resource type="Texture2D" path="res://assets/palettes/overworld/enemies/green-cheep.png" id="art"]
+
+[sub_resource type="RectangleShape2D" id="player_contact"]
+size = Vector2(10, 6)
+
+[node name="SwimmingCheepCheep" instance=ExtResource("base")]
+script = ExtResource("actor")
+
+[node name="StateMachine" parent="." index="0" node_paths=PackedStringArray("initial_state")]
+initial_state = NodePath("Swimming")
+
+[node name="Swimming" type="Node" parent="StateMachine" index="0"]
+script = ExtResource("swim")
+frame_updates_enabled = false
+input_enabled = false
+
+[node name="KnockedOut" type="Node" parent="StateMachine" index="1"]
+script = ExtResource("defeated")
+launch_speed = -60.0
+launch_gravity_units = 15
+launch_fall_limit = 2
+stop_animation_on_enter = true
+frame_updates_enabled = false
+input_enabled = false
+
+[node name="Body" parent="." index="1"]
+position = Vector2(8, 16)
+collision_mask = 0
+
+[node name="CollisionShape2D" parent="Body" index="0"]
+disabled = true
+
+[node name="Sprite2D" parent="Body" index="1"]
+texture = ExtResource("art")
+hframes = 2
+position = Vector2(0, 1)
+
+[node name="EnemyContact" parent="Body" index="2"]
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
+
+[node name="CollisionShape2D" parent="Body/BlockHitReceiver" index="0"]
+disabled = true
+
+[node name="PlayerContact" type="Area2D" parent="Body" index="5"]
+position = Vector2(0, 1)
+collision_layer = 0
+collision_mask = 1024
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Body/PlayerContact"]
+shape = SubResource("player_contact")
+
+[editable path="Body/BlockHitReceiver"]

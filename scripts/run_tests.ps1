@@ -12,6 +12,9 @@ New-Item -ItemType Directory -Path $logDirectory -Force | Out-Null
 $savedAppData = $env:APPDATA
 $savedLocalAppData = $env:LOCALAPPDATA
 $failedTests = @()
+$passedTests = 0
+$skippedTests = 0
+$renderedChecksSkipped = 0
 
 try {
     $env:APPDATA = Join-Path $logDirectory 'appdata'
@@ -35,13 +38,25 @@ try {
         $output = & $enginePath --headless --path $projectRoot $scenePath --max-fps 60 --quit-after 1800 --log-file (Join-Path $logDirectory ($scene.BaseName + '.log')) 2>&1 |
             ForEach-Object { $_.ToString() }
         $engineExitCode = $LASTEXITCODE
-        if ($engineExitCode -ne 0 -or -not ($output -match '^(PASS:|[A-Za-z0-9_]+_test: PASS$)') -or
-            ($output -match '^(SCRIPT ERROR|ERROR|WARNING):')) {
+        $passed = $output -match '^(PASS:|[A-Za-z0-9_]+_test: PASS$)'
+        $skipped = $output -match '^SKIP: rendered window required$'
+        $renderedSkipped = $output -match '^SKIP RENDERED:'
+        if ($engineExitCode -ne 0 -or ($output -match '^(SCRIPT ERROR|ERROR|WARNING):') -or
+            ([bool]$passed -eq [bool]$skipped)) {
             $failedTests += $scene.BaseName
             Write-Host ('FAIL: ' + $scene.BaseName + ' (engine exit ' + $engineExitCode + ')')
             $output | ForEach-Object { Write-Host $_ }
+        } elseif ($skipped) {
+            $skippedTests++
+            Write-Host ('SKIP: ' + $scene.BaseName + ' (rendered window required)')
         } else {
-            Write-Host ('PASS: ' + $scene.BaseName)
+            $passedTests++
+            if ($renderedSkipped) {
+                $renderedChecksSkipped++
+                Write-Host ('PASS: ' + $scene.BaseName + ' (rendered checks skipped)')
+            } else {
+                Write-Host ('PASS: ' + $scene.BaseName)
+            }
         }
     }
 } finally {
@@ -49,8 +64,10 @@ try {
     $env:LOCALAPPDATA = $savedLocalAppData
 }
 
+Write-Host (
+    'Headless results: {0} passed ({1} with rendered checks skipped), {2} skipped, {3} failed.' -f
+    $passedTests, $renderedChecksSkipped, $skippedTests, $failedTests.Count
+)
 if ($failedTests.Count -gt 0) {
     throw ('Failed checks: ' + ($failedTests -join ', '))
 }
-$scope = if ($TestName.Count -gt 0) { 'selected' } else { 'all' }
-Write-Host ('PASS: ' + $scope + ' ' + $testScenes.Count + ' test scenes, without engine errors or warnings.')

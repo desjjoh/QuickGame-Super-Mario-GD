@@ -63,8 +63,14 @@ func _read_guide_lines() -> Array[Vector2]:
 func _draw() -> void:
 	if not Engine.is_editor_hint() or _guide_lines.is_empty():
 		return
-	_draw_guide(0, "Approach camera left", APPROACH_COLOR, Vector2(4, 24))
-	_draw_guide(2, "Rescue camera left", RESCUE_COLOR, Vector2(4, 36))
+	var label_offset := LevelCamera.EDITOR_GUIDE_LABEL_OFFSET
+	var approach_label := "Approach camera left"
+	var approach_width := ThemeDB.fallback_font.get_string_size(
+		approach_label, HORIZONTAL_ALIGNMENT_LEFT, -1, 10
+	).x
+	var approach_offset := Vector2(-approach_width - label_offset.x, label_offset.y)
+	_draw_guide(0, approach_label, APPROACH_COLOR, approach_offset)
+	_draw_guide(2, "Rescue camera left", RESCUE_COLOR, label_offset)
 	_draw_guide(4, "Bowser fall cutoff", FALLOFF_COLOR, Vector2(4, -4))
 
 

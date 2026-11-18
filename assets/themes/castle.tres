@@ -1,5 +1,7 @@
 [gd_resource type="Resource" script_class="AreaTheme" format=3 uid="uid://cg0b0p2illtvs"]
 
+[ext_resource type="Texture2D" path="res://assets/palettes/castle/enemies/green-cheep.png" id="enemies_green_cheep"]
+[ext_resource type="Texture2D" path="res://assets/palettes/castle/enemies/blooper.png" id="enemies_blooper"]
 [ext_resource type="Texture2D" path="res://assets/palettes/castle/misc/vine.png" id="vine"]
 [ext_resource type="Script" uid="uid://cskir81ip20rf" path="res://scripts/themes/area_theme.gd" id="1"]
 [ext_resource type="TileSet" uid="uid://ieueexne6svp" path="res://assets/tileset/castle/terrain.tres" id="2"]
@@ -42,6 +44,8 @@
 [ext_resource type="Texture2D" uid="uid://0vk0wefn4b7g" path="res://assets/palettes/castle/ui/start-cursor.png" id="title_cursor"]
 [ext_resource type="Texture2D" path="res://assets/palettes/castle/interactibles/items/coins.tres" id="world_coin"]
 
+[ext_resource type="Texture2D" path="res://assets/palettes/castle/interactibles/items/alternate_coins.tres" id="alternate_coins"]
+
 [resource]
 script = ExtResource("1")
 display_name = "Castle"
@@ -51,6 +55,9 @@ decorations = ExtResource("3")
 entity_markers = ExtResource("4")
 enemy_markers = ExtResource("enemy_markers")
 texture_overrides = Dictionary[String, Texture2D]({
+"res://assets/palettes/overworld/interactibles/items/alternate_coins.tres": ExtResource("alternate_coins"),
+"res://assets/palettes/overworld/enemies/green-cheep.png": ExtResource("enemies_green_cheep"),
+"res://assets/palettes/overworld/enemies/blooper.png": ExtResource("enemies_blooper"),
 "res://assets/palettes/overworld/misc/vine.png": ExtResource("vine"),
 "res://assets/palettes/overworld/enemies/bowser.png": ExtResource("bowser"),
 "res://assets/palettes/overworld/enemies/goomba.png": ExtResource("goomba"),

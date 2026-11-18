@@ -8,8 +8,8 @@ const AVAILABLE_ITEM := 3
 const REWARD_EFFECT := 4
 const ENEMY := 5
 const HUD := 6
-const PLAYER := 7
-const FIREBALL := 8
+const FIREBALL := 7
+const PLAYER := 8
 
 
 static func apply(item: CanvasItem, priority: int) -> void:

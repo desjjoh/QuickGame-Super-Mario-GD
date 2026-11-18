@@ -83,6 +83,8 @@ const TRACE_SPEED := [
 
 
 func _ready() -> void:
+	if DisplayServer.get_name() == "headless":
+		print("SKIP RENDERED: Fire throw pose pixels")
 	if DisplayServer.get_name() != "headless":
 		await check_rendered_pose()
 		print("PASS: Rendered Fire throw pixels in both directions.")
@@ -166,13 +168,23 @@ func check_trace(left: bool, wall: bool) -> void:
 		assert(shot.bouncing == (tick in [7, 28]), "bounce at %s" % tick)
 		assert(shot.burst_tick == (tick - 9 if wall and tick >= 9 else -1))
 		if wall and tick in range(10, 16):
-			assert(shot.sprite.position == Vector2(-4, -4))
-			assert(shot.sprite.frame == ((tick - 10) >> 1))
+			check_burst_frame(shot, Vector2(172, 194), tick - 9)
 		assert(shot.is_queued_for_deletion() == (tick == release))
 	await get_tree().process_frame
 	assert(not is_instance_valid(shot))
 	level.queue_free()
 	await get_tree().process_frame
+
+
+# Mesen draws a 16 px burst around the preceding 8 px flight sprite.
+func check_burst_frame(shot: Fireball, impact: Vector2, tick: int) -> void:
+	var rect := shot.sprite.get_rect()
+	assert(shot.burst_tick == tick)
+	assert(shot.global_position == impact)
+	assert(shot.sprite.visible and shot.sprite.frame == ((tick - 1) >> 1))
+	assert(shot.sprite.z_index < BaseLevel.containing(shot).players.z_index)
+	assert(rect.size == Vector2(16, 16))
+	assert(shot.sprite.to_global(rect.position) == impact + Vector2(-4, -3))
 
 
 func check_low_ceiling() -> void:
@@ -269,7 +281,12 @@ func check_flagpole() -> void:
 			assert(shot.burst_tick == 0, "A fireball bursts on the flagpole shaft")
 			assert(is_equal_approx(shot.global_position.x, 165.0 if left else 163.0))
 			assert(not shot.bouncing and not level.ending_in_progress)
-			shot.queue_free()
+			var impact := shot.global_position
+			for tick in range(1, 7):
+				shot.advance()
+				check_burst_frame(shot, impact, tick)
+			shot.advance()
+			assert(shot.is_queued_for_deletion() and not shot.sprite.visible)
 			await get_tree().process_frame
 			await get_tree().physics_frame
 	level.queue_free()
@@ -317,6 +334,9 @@ func check_enemy_hit(
 	enemy._physics_process(STEP)
 	assert(enemy.body.global_position == before + Vector2(1, -5), "Hit step runs once")
 	# Mesen preserves live enemy Y fractions. Godot starts the launch on its own grid.
+	var impact := shot.global_position
+	if scene == GOOMBA:
+		assert(impact == Vector2(152, 193))
 	var reference_y := [-5, -8, -11, -13, -15, -17, -18, -20]
 	if scene == KOOPA:
 		reference_y = [-5, -8, -10, -13, -15, -16, -18, -19]
@@ -326,6 +346,8 @@ func check_enemy_hit(
 		await get_tree().physics_frame
 		enemy._physics_process(STEP)
 		shot.advance()
+		if tick < 7:
+			check_burst_frame(shot, impact, tick)
 		assert(enemy.body.global_position.x == before.x + tick + 1)
 		assert(absf(enemy.body.global_position.y - before.y - reference_y[tick]) <= 1.0)
 		assert(shot.is_queued_for_deletion() == (tick == 7))
@@ -484,6 +506,7 @@ func check_throw_pose(luigi: bool, speed: float, air: bool, duration: int, skid 
 			var expected_y := floorf(feet.y) - 28.0 if air else 180.0
 			assert(shot.global_position == Vector2(expected_x, expected_y))
 			assert(not shot.sprite.z_as_relative and shot.sprite.z_index == DRAW_ORDER.FIREBALL)
+			assert(shot.sprite.z_index < level.players.z_index)
 		assert(pose.visible == (tick < duration), "Throw duration at tick %s" % tick)
 		if pose.visible:
 			var walking := not air and not skid and speed > 0.0

@@ -117,7 +117,8 @@ func _check_step_off(player: Mario, vine: GrowingVine, side: float) -> bool:
 	assert(player.state_machine.current_state == move)
 	assert(player.climbing.get_surface() == null)
 	assert(player.body.global_position.is_equal_approx(start + Vector2(side * 4.0, 0.0)))
-	for tick in range(6):
+	# Grounded acceleration can take seven ticks to produce another pixel to the right.
+	for tick in range(7):
 		await stepped
 	Input.action_release(action)
 	assert(player.climbing.get_surface() == null)

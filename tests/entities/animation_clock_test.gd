@@ -23,6 +23,8 @@ func check_pair(
 
 
 func _ready() -> void:
+	if DisplayServer.get_name() == "headless":
+		print("SKIP RENDERED: late animation join over rendered frames")
 	var clock := GameHandler.animation_clock
 	var cycle := (
 		load("res://scenes/components/presentation/palette_pulse.tres") as CosmeticAnimationCycle

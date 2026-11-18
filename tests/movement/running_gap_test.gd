@@ -14,61 +14,7 @@ func _ready() -> void:
 	var game_scene := load("res://tests/fixtures/silent_game.tscn") as PackedScene
 	for direction in [-1.0, 1.0]:
 		for phase in [0.0, 0.5, 1.0, 1.5, 2.0]:
-			var game := game_scene.instantiate() as Node
-			add_child(game)
-			TEST_FLOOR.extend_floor(game)
-			var level := GameHandler.current_level
-			level.keep_player_on_screen = false
-			(get_viewport().get_camera_2d() as LevelCamera).follow_enabled = false
-			var ground := level.get_node("Areas/MainArea/Layouts/GroundLayout") as TileMapLayer
-			for y in [13, 14]:
-				ground.erase_cell(Vector2i(6, y))
-			var player := level.player
-			player.body.global_position.x = (84.0 if direction > 0 else 124.0) + direction * phase
-			for frame in range(5):
-				await physics_step_finished
-			var action: StringName = (
-				ControllerHandler.right_action if direction > 0 else ControllerHandler.left_action
-			)
-			Input.action_press(action)
-			Input.action_press(ControllerHandler.secondary_action)
-			player.body.velocity.x = direction * 150.0
-			player.face_direction(direction)
-			player.state_machine.change_state(player.state_machine.get_state(&"Move"))
-			var left_support := false
-			for frame in range(25):
-				await physics_step_finished
-				if not left_support and not player.has_floor_support():
-					left_support = true
-					assert(is_zero_approx(player.body.velocity.y))
-					assert(absf(player.body.global_position.y - 208.0) < 0.2)
-				assert(
-					player.body.global_position.y < 212.0, "Run must recover shallow one-tile gaps."
-				)
-				assert(
-					player.state_machine.current_state is MarioMoveState,
-					"Passive gap crossing must remain in Move, with no Jump pose flash."
-				)
-				assert(player.animation_player.current_animation == "walk")
-				assert(
-					absf(player.body.velocity.x) > 140.0,
-					(
-						"Gap contact must preserve run momentum: direction=%s phase=%s frame=%s pos=%s velocity=%s"
-						% [
-							direction,
-							phase,
-							frame,
-							player.body.global_position,
-							player.body.velocity
-						]
-					)
-				)
-			assert(left_support and player.has_floor_support())
-			Input.action_release(action)
-			Input.action_release(ControllerHandler.secondary_action)
-			game.free()
-			# Let the viewport release this fixture's camera before creating the next one.
-			await get_tree().process_frame
+			await _check_gap(game_scene, direction, phase, false)
 	var wide_game := game_scene.instantiate() as Node
 	add_child(wide_game)
 	TEST_FLOOR.extend_floor(wide_game)
@@ -96,7 +42,78 @@ func _ready() -> void:
 	Input.action_release(ControllerHandler.right_action)
 	Input.action_release(ControllerHandler.secondary_action)
 	wide_game.free()
+	await get_tree().process_frame
+	for direction in [-1.0, 1.0]:
+		await _check_gap(game_scene, direction, 0.0, true)
 	print(
-		"PASS: one-tile gap runs in both directions at five subpixel phases; wider gaps still cause falling."
+		"PASS: ten seeded one-tile gap runs, two run-ups from rest, and the two-tile fall."
 	)
 	await preload("res://tests/fixtures/finish_test.gd").finish(get_tree())
+
+
+func _check_gap(game_scene: PackedScene, direction: float, phase: float, from_rest: bool) -> void:
+	var game := game_scene.instantiate() as Node
+	add_child(game)
+	TEST_FLOOR.extend_floor(game)
+	var level := GameHandler.current_level
+	level.keep_player_on_screen = false
+	(get_viewport().get_camera_2d() as LevelCamera).follow_enabled = false
+	var ground := level.get_node("Areas/MainArea/Layouts/GroundLayout") as TileMapLayer
+	for y in [13, 14]:
+		ground.erase_cell(Vector2i(6, y))
+	var player := level.player
+	var approach_x := 84.0 if direction > 0 else 124.0
+	var run_up := 66.0 if from_rest else 0.0
+	player.body.global_position.x = approach_x + direction * (phase - run_up)
+	await get_tree().process_frame
+	for frame in range(5):
+		await physics_step_finished
+	var action: StringName = (
+		ControllerHandler.right_action if direction > 0 else ControllerHandler.left_action
+	)
+	Input.action_press(action)
+	Input.action_press(ControllerHandler.secondary_action)
+	if from_rest:
+		assert(player.has_floor_support() and is_zero_approx(player.body.velocity.x))
+	else:
+		player.body.velocity.x = direction * 150.0
+		player.face_direction(direction)
+		player.state_machine.change_state(player.state_machine.get_state(&"Move"))
+	var left_support := false
+	var entered_gap := false
+	var frames := 85 if from_rest else 25
+	for frame in range(frames):
+		await physics_step_finished
+		var x := player.body.global_position.x
+		entered_gap = entered_gap or (x >= 96.0 and x < 112.0)
+		if not left_support and (entered_gap or not from_rest) and not player.has_floor_support():
+			left_support = true
+			assert(is_zero_approx(player.body.velocity.y))
+			assert(absf(player.body.global_position.y - 208.0) < 0.2)
+		assert(
+			player.body.global_position.y < 212.0, "Run must recover shallow one-tile gaps."
+		)
+		assert(
+			player.state_machine.current_state is MarioMoveState,
+			"Passive gap crossing must remain in Move, with no Jump pose flash."
+		)
+		assert(player.animation_player.current_animation == "walk")
+		assert(
+			(from_rest and not entered_gap) or absf(player.body.velocity.x) > 140.0,
+			(
+				"Gap contact must preserve run momentum: direction=%s phase=%s frame=%s pos=%s velocity=%s"
+				% [
+					direction,
+					phase,
+					frame,
+					player.body.global_position,
+					player.body.velocity
+				]
+			)
+		)
+	assert(left_support and player.has_floor_support())
+	Input.action_release(action)
+	Input.action_release(ControllerHandler.secondary_action)
+	game.free()
+	# Let the viewport release this fixture's camera before creating the next one.
+	await get_tree().process_frame

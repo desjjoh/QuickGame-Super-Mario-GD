@@ -9,6 +9,8 @@ extends PlayerState
 var _previous_animation_speed: float = 1.0
 var _falling: bool = false
 var _defer_transformation_vertical := false
+var _start_direction := 0
+var _moving_direction := 0
 
 
 func defer_transformation_fall_step() -> void:
@@ -24,6 +26,7 @@ func enter() -> void:
 
 func exit() -> void:
 	_defer_transformation_vertical = false
+	_start_direction = 0
 	if _falling:
 		get_player().air_movement.end(get_player().motion_values)
 		get_player().motion_values.remove_modifier(&"passive_fall")
@@ -44,14 +47,7 @@ func process_physics(delta: float) -> BaseState:
 	if player.slide_action.can_start(player.body, direction):
 		return continue_physics(slide_state, delta)
 
-	# Low-speed reversal finishes immediately instead of entering a visible skid.
-	if player.slide_action.is_opposing(player.body, direction):
-		player.body.velocity.x = 0.0
-
-	player.horizontal_movement.apply(player.body, player.motion_values, direction, delta)
-	player.face_direction(direction)
-	player.body.velocity.y = 0.0
-	player.move_body()
+	_move_on_ground(player, direction, delta)
 	if player.scripted_motion_step.is_valid():
 		return null
 
@@ -65,6 +61,73 @@ func process_physics(delta: float) -> BaseState:
 		return idle_state
 
 	return null
+
+
+func _move_on_ground(player: BasePlayer, direction: float, delta: float) -> void:
+	var body := player.body
+	var opposite := player.slide_action.is_opposing(body, direction)
+	# Low-speed reversal finishes immediately instead of entering a visible skid.
+	if opposite:
+		body.velocity.x = 0.0
+	var speed := _prepare_ground_start(player, direction, delta, opposite)
+	if is_nan(speed):
+		player.horizontal_movement.apply(body, player.motion_values, direction, delta)
+	var target_x := body.global_position.x + body.velocity.x * delta
+	player.face_direction(direction)
+	body.velocity.y = 0.0
+	player.move_body()
+
+	if not is_nan(speed):
+		# Use the physics result for blocked movement. Publish the speed byte
+		# after an unobstructed step so a jump inherits speed, not displacement.
+		var reached_target := absf(body.global_position.x - target_x) < 0.01
+		if reached_target:
+			body.velocity.x = speed
+		if not reached_target or not player.has_floor_support():
+			_start_direction = 0
+	if not is_zero_approx(body.velocity.x):
+		_moving_direction = int(signf(body.velocity.x))
+
+
+func _prepare_ground_start(
+	player: BasePlayer, direction: float, delta: float, opposite: bool
+) -> float:
+	var body := player.body
+	var movement := player.horizontal_movement
+	var values := player.motion_values
+	if (
+		absf(direction) != 1.0 or opposite or not is_equal_approx(delta, 1.0 / 60.0)
+		or player.scripted_motion_step.is_valid()
+	):
+		_start_direction = 0
+		return NAN
+	if _start_direction != int(direction):
+		_start_direction = 0
+		if not is_zero_approx(body.velocity.x):
+			return NAN
+		movement.reset_fractional_step()
+		_start_direction = int(direction)
+
+	var facing := -1 if player.sprite.flip_h else 1
+	var acceleration := values.acceleration
+	var max_speed := values.max_speed
+	if _moving_direction != _start_direction:
+		# Run is eligible once input agrees with the stored movement direction.
+		acceleration = values.base_acceleration
+		max_speed = values.base_max_speed
+		if _moving_direction != facing:
+			acceleration *= 2.0
+		_moving_direction = facing
+		movement.reset_fractional_step(false)
+	var force := roundi(acceleration * (256.0 * 16.0 / (60.0 * 60.0)))
+	var limit := floori(max_speed * 16.0 / 60.0)
+	if limit <= 0 or force <= 0:
+		_start_direction = 0
+		return NAN
+	var speed := movement.prepare_fractional_step(body, _start_direction, force, limit, delta)
+	if absf(speed) >= limit * 60.0 / 16.0:
+		_start_direction = 0
+	return speed
 
 
 func _process_falling(player: BasePlayer, direction: float, delta: float) -> BaseState:

@@ -1,9 +1,9 @@
-[gd_resource type="TileSet" format=3]
+[gd_resource type="TileSet" format=3 uid="uid://bn717qg7qykwb"]
 
-[ext_resource type="Texture2D" path="res://assets/palettes/underwater/tileset/Palette 3 (Pipes and Scenery).png" id="art_1"]
-[ext_resource type="Texture2D" path="res://assets/palettes/underwater/tileset/Palette 1 (Ground and Stone).png" id="art_2"]
-[ext_resource type="Texture2D" path="res://assets/palettes/underwater/tileset/Palette 2 (Water and Sky).png" id="sky_art"]
-[ext_resource type="Texture2D" path="res://assets/palettes/underwater/tileset/Palette 4 (Coins and Interactibles).png" id="spent_art"]
+[ext_resource type="Texture2D" uid="uid://dr7obflu2ti8r" path="res://assets/palettes/underwater/tileset/Palette 3 (Pipes and Scenery).png" id="art_1"]
+[ext_resource type="Texture2D" uid="uid://d2ol8ojjjavty" path="res://assets/palettes/underwater/tileset/Palette 1 (Ground and Stone).png" id="art_2"]
+[ext_resource type="Texture2D" uid="uid://dgm1ux3gnt6uq" path="res://assets/palettes/underwater/tileset/Palette 2 (Water and Sky).png" id="sky_art"]
+[ext_resource type="Texture2D" uid="uid://17tjt0yg72ai" path="res://assets/palettes/underwater/tileset/Palette 4 (Coins and Interactibles).png" id="spent_art"]
 
 [sub_resource type="TileSetAtlasSource" id="Source_0"]
 resource_name = "Solid ground"
@@ -69,6 +69,12 @@ texture = ExtResource("sky_art")
 4:0/0 = 0
 4:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
 
+[sub_resource type="TileSetAtlasSource" id="reef_ground"]
+resource_name = "Reef"
+texture = ExtResource("art_1")
+3:1/0 = 0
+3:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+
 [resource]
 physics_layer_0/collision_layer = 1
 sources/0 = SubResource("Source_0")
@@ -76,3 +82,4 @@ sources/1 = SubResource("Source_1")
 sources/2 = SubResource("tree_tops")
 sources/3 = SubResource("spent_question_block")
 sources/4 = SubResource("cloud_ground")
+sources/5 = SubResource("reef_ground")

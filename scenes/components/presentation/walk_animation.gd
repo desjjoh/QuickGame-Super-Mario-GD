@@ -41,11 +41,19 @@ func show_pose(animation_player: AnimationPlayer) -> void:
 	if not animation_player.is_playing() or animation_player.current_animation != &"walk":
 		animation_player.play(&"walk")
 	animation_player.speed_scale = 0.0
-	animation_player.seek(clip.track_get_key_time(0, (pose_index + 2) % 3), true)
+	animation_player.seek(clip.track_get_key_time(0, walk_frame_index()), true)
+
+
+func walk_frame_index() -> int:
+	return (pose_index + 2) % 3
 
 
 func advance_pose(animation_player: AnimationPlayer, horizontal_velocity: float) -> void:
 	show_pose(animation_player)
+	advance_cycle(horizontal_velocity)
+
+
+func advance_cycle(horizontal_velocity: float) -> void:
 	# Draw the current pose first. A reload advances the pose for the next tick.
 	if ticks_left == 0:
 		ticks_left = get_frame_ticks(horizontal_velocity)

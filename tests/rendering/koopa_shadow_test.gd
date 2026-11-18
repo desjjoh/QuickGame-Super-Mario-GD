@@ -10,7 +10,7 @@ func render_frame() -> void:
 
 func _ready() -> void:
 	if DisplayServer.get_name() == "headless":
-		print("koopa_shadow_test: PASS")
+		print("SKIP: rendered window required")
 		await FINISH_TEST.finish(get_tree())
 		return
 	var level := load("res://tests/fixtures/sandbox_level.tscn").instantiate() as BaseLevel

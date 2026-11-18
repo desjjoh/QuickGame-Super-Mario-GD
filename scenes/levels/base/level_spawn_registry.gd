@@ -46,6 +46,16 @@ func try_claim(category: StringName, actor: Node, replace_oldest := false) -> bo
 	return true
 
 
+## Whether any of the first shared enemy slots are free.
+func has_enemy_slot_before(slot_end: int) -> bool:
+	var slots: Dictionary = _spawn_slots.get(&"enemy", {})
+	var occupied := slots.values()
+	for slot in range(mini(slot_end, enemy_limit)):
+		if not occupied.has(slot):
+			return true
+	return false
+
+
 func _get_limit(category: StringName) -> int:
 	match category:
 		&"enemy":

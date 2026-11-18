@@ -93,12 +93,13 @@ func sample(shot: Image, x: int, y: int) -> Color:
 
 func _ready() -> void:
 	if DisplayServer.get_name() == "headless":
-		print("window_render_test: SKIPPED (rendered window required)")
+		print("SKIP: rendered window required")
 		get_tree().quit()
 		return
 	var game := load("res://scenes/main/game.tscn").instantiate() as Node
 	game.start_with_title = false
 	game.transitions_enabled = false
+	game.integer_scaling = false
 	game.stages.assign([load("res://tests/fixtures/sandbox_level.tscn")])
 	add_child(game)
 	for dimensions in [Vector2i(768, 720), Vector2i(1024, 960), Vector2i(1000, 700)]:
