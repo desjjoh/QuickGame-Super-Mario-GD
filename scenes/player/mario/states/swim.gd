@@ -46,6 +46,10 @@ func exit() -> void:
 	get_player().motion_values.remove_modifier(MOTION_PROFILE)
 
 
+func get_moving_direction() -> int:
+	return _moving_direction
+
+
 func accepts_depth_input() -> bool:
 	if not is_instance_valid(_area):
 		return true
@@ -78,6 +82,7 @@ func process_physics(delta: float) -> BaseState:
 		player.play_sound_effect(SoundHandler.get_sound(&"stomp"))
 		grounded = false
 	if not grounded:
+		player.form_controller.set_crouched(false)
 		if (
 			player.body.velocity.y >= 0.0
 			or (
@@ -96,6 +101,8 @@ func process_physics(delta: float) -> BaseState:
 	_previous_jump = jump
 	_move(player, grounded, direction, delta)
 	_apply_whirlpool(player)
+	if player.form_controller.is_crouched and not player.has_floor_support():
+		player.form_controller.set_crouched(false)
 	_update_pose(player, direction, jump, previous_speed)
 	return null
 

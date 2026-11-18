@@ -106,6 +106,8 @@ Paint **Red Parakoopa Spawner** on **EnemyLayout** to place a Red Koopa that fli
 
 Paint **Green Parakoopa Spawner** on **EnemyLayout** for the hopping variant. Each marker activates one enemy at that cell. The 2-1 markers are at (151, 12), (169, 12), and (171, 12).
 
+Paint **Blooper Spawner** on the underwater **EnemyLayout** at the intended start cell. Blooper starts eight pixels below the marker's top edge and uses the normal enemy slot limit. The slot determines whether a turn aims toward Mario or follows his movement direction.
+
 ## Place moving lifts
 
 Instance `scenes/entities/spawners/lift_spawner.tscn` under the area's **WorldObjects**. Its X position is the lift's left edge. Put the marker at the incoming edge and set **Direction** to **Up** or **Down**. For a 240 px view starting at Y=0, use Y=248 for Up or Y=−8 for Down.

@@ -1,5 +1,6 @@
 [gd_resource type="Resource" script_class="AreaTheme" format=3 uid="uid://chfcnww7r30v7"]
 
+[ext_resource type="Texture2D" path="res://assets/palettes/underground/enemies/blooper.png" id="enemies_blooper"]
 [ext_resource type="Texture2D" path="res://assets/palettes/underground/misc/vine.png" id="vine"]
 [ext_resource type="Script" uid="uid://cskir81ip20rf" path="res://scripts/themes/area_theme.gd" id="1"]
 [ext_resource type="TileSet" uid="uid://g7pmg7w6xn86" path="res://assets/tileset/underground/terrain.tres" id="2"]
@@ -51,6 +52,7 @@ decorations = ExtResource("3")
 entity_markers = ExtResource("4")
 enemy_markers = ExtResource("enemy_markers")
 texture_overrides = Dictionary[String, Texture2D]({
+"res://assets/palettes/overworld/enemies/blooper.png": ExtResource("enemies_blooper"),
 "res://assets/palettes/overworld/misc/vine.png": ExtResource("vine"),
 "res://assets/palettes/overworld/enemies/bowser.png": ExtResource("bowser"),
 "res://assets/palettes/overworld/enemies/goomba.png": ExtResource("goomba"),

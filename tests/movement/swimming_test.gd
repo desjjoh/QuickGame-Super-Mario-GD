@@ -49,7 +49,13 @@ func _ready() -> void:
 	ControllerHandler.set_physics_process(true)
 	assert(matches)
 	await _compare_poses()
-	print("PASS: Both characters match 17 Mesen swim motion traces and all swim form poses.")
+	ControllerHandler.set_physics_process(false)
+	for luigi in [false, true]:
+		for fire in [false, true]:
+			await _check_crouch_stroke(luigi, fire)
+	ControllerHandler._clear_input()
+	ControllerHandler.set_physics_process(true)
+	print("PASS: Both characters match 17 Mesen swim motion traces and all swim form poses. Super and Fire release crouch on a stroke.")
 	await preload("res://tests/fixtures/finish_test.gd").finish(get_tree())
 
 
@@ -192,5 +198,59 @@ func _compare_pose_case(rows: Array, label: String, luigi: bool, form_index: int
 		assert(pose == form.swim[int(row[3])], "%s %s pose at tick %d" % [label, form.display_name, tick])
 		assert(pose.region.position.x == columns[int(row[3])] * 16)
 		await get_tree().physics_frame
+	level.queue_free()
+	await get_tree().process_frame
+
+
+func _check_crouch_stroke(luigi: bool, fire: bool) -> void:
+	var level := SANDBOX.instantiate() as BaseLevel
+	level.player_start_configuration = null
+	if luigi:
+		level.player_scene = LUIGI
+	var spawn := level.get_node("Players/PlayerSpawn") as Marker2D
+	spawn.position = Vector2(88, 208)
+	add_child(level)
+	level.set_physics_process(false)
+	var player := level.player as Mario
+	player.set_physics_process(false)
+	var form := player.fire_form if fire else player.super_form
+	player.form_controller.configure(player, form)
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	player.move_body()
+	assert(player.has_floor_support())
+	var hurtbox := player.enemy_hurtbox
+	var contact := hurtbox.get_node("CollisionShape2D") as CollisionShape2D
+
+	ControllerHandler.input_down = 1.0
+	player._physics_process(STEP)
+	assert(player.form_controller.is_crouched and player.sprite.texture == form.crouch)
+	assert(contact.shape.get_rect().size == form.crouched_contact_size)
+	assert(hurtbox.position == form.crouched_contact_position)
+	await get_tree().physics_frame
+
+	# Holding Down throughout the stroke must never restore crouch in open water.
+	ControllerHandler.input_primary = true
+	ControllerHandler.input_primary_just_pressed = true
+	player._physics_process(STEP)
+	assert(not player.has_floor_support())
+	assert(form.swim.has(player.sprite.texture))
+	ControllerHandler.input_primary_just_pressed = false
+	var landed := false
+	for frame in range(180):
+		assert(not player.form_controller.is_crouched)
+		assert(contact.shape.get_rect().size == form.standing_contact_size)
+		assert(hurtbox.position == form.standing_contact_position)
+		if player.has_floor_support():
+			landed = true
+			break
+		await get_tree().physics_frame
+		player._physics_process(STEP)
+	assert(landed)
+	await get_tree().physics_frame
+	ControllerHandler.input_primary = false
+	player._physics_process(STEP)
+	assert(player.form_controller.is_crouched and player.sprite.texture == form.crouch)
+	ControllerHandler._clear_input()
 	level.queue_free()
 	await get_tree().process_frame

@@ -3,9 +3,12 @@ extends EntityState
 
 @export var duration := 0.5
 @export var launch_speed := 0.0
+@export var launch_gravity_units := 61
+@export var launch_fall_limit := 3
 @export var horizontal_speed := 0.0
 @export var defeat_sprite_y_offset := 0.0
 
+var launch_speed_fraction := 0
 var launch_direction := 1.0
 var fireball_launch := false
 var star_launch := false
@@ -29,7 +32,7 @@ func enter() -> void:
 		_apply_launch_pose()
 	if fireball_launch or star_launch:
 		_launch_hit_tick = Engine.get_physics_frames()
-		_speed_units = roundi(launch_speed / 60.0 * 256.0)
+		_speed_units = roundi(launch_speed / 60.0 * 256.0) + launch_speed_fraction
 		_position_fraction = 0
 		_sprite_anchor = entity.sprite.position
 		(entity as BaseEnemy).body.position.y -= 2.0
@@ -71,9 +74,9 @@ func _advance_fractional_launch() -> void:
 	var step := _speed_units + _position_fraction
 	var motion := Vector2(_velocity.x / 60.0, step >> 8)
 	_position_fraction = step & 0xff
-	_speed_units += 61
-	if _speed_units >= 3 * 256 + 128:
-		_speed_units = 3 * 256
+	_speed_units += launch_gravity_units
+	if _speed_units >= launch_fall_limit * 256 + 128:
+		_speed_units = launch_fall_limit * 256
 	body.position += motion
 	# The ROM draws the corrected pose before advancing the defeated body.
 	entity.sprite.position = _sprite_anchor - motion

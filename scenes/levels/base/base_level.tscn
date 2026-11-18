@@ -1,5 +1,6 @@
 [gd_scene format=3 uid="uid://wlp13xllihs5"]
 
+[ext_resource type="PackedScene" path="res://scenes/entities/spawners/blooper_spawner.tscn" id="blooper"]
 [ext_resource type="PackedScene" path="res://scenes/entities/spawners/green_koopa_spawner.tscn" id="green_koopa"]
 [ext_resource type="PackedScene" path="res://scenes/entities/spawners/green_koopa_pair_spawner.tscn" id="green_koopa_pair"]
 [ext_resource type="PackedScene" path="res://scenes/entities/spawners/green_parakoopa_spawner.tscn" id="green_parakoopa"]
@@ -53,6 +54,7 @@ script = ExtResource("1_script")
 death_sound = ExtResource("death_sound")
 entity_scenes = Dictionary[StringName, PackedScene]({
 &"brick": ExtResource("entity_brick"),
+&"blooper_spawner": ExtResource("blooper"),
 &"brick_alternate": ExtResource("entity_brick_alternate"),
 &"castle": ExtResource("entity_castle"),
 &"coin": ExtResource("coin"),

@@ -1,5 +1,6 @@
 [gd_resource type="TileSet" format=3 uid="uid://gd85bqv464i5"]
 
+[ext_resource type="Texture2D" path="res://assets/palettes/underwater/enemies/blooper.png" id="blooper_art"]
 [ext_resource type="Texture2D" uid="uid://dftdon2srae6b" path="res://assets/palettes/underwater/enemies/goomba.png" id="goomba"]
 [ext_resource type="Texture2D" uid="uid://2y0g3s4gkd36" path="res://assets/palettes/underwater/enemies/koopa.png" id="koopa"]
 [ext_resource type="Texture2D" uid="uid://c236w6qqt7obc" path="res://assets/enemies/red-koopa.png" id="red_koopa_art"]
@@ -64,6 +65,15 @@ texture_region_size = Vector2i(16, 32)
 0:0/0/texture_origin = Vector2i(0, 8)
 0:0/0/custom_data_0 = "green_parakoopa_spawner"
 
+[sub_resource type="TileSetAtlasSource" id="blooper"]
+resource_name = "Blooper Spawner"
+texture = ExtResource("blooper_art")
+margins = Vector2i(0, 8)
+texture_region_size = Vector2i(16, 24)
+0:0/0 = 0
+0:0/0/texture_origin = Vector2i(0, 4)
+0:0/0/custom_data_0 = "blooper_spawner"
+
 [resource]
 custom_data_layer_0/name = "entity_id"
 custom_data_layer_0/type = 4
@@ -75,3 +85,4 @@ sources/4 = SubResource("koopa_pair")
 sources/5 = SubResource("red_koopa")
 sources/6 = SubResource("red_parakoopa")
 sources/7 = SubResource("green_parakoopa")
+sources/8 = SubResource("blooper")
