@@ -3,6 +3,6 @@ extends Mario
 var body_steps: int = 0
 
 
-func move_body(gravity_after_motion: bool = false) -> void:
+func move_body(gravity_after_motion: bool = false) -> bool:
 	body_steps += 1
-	super(gravity_after_motion)
+	return super(gravity_after_motion)

@@ -105,6 +105,8 @@ active_distance = 1792.0
 
 [node name="Arrival" parent="Areas/MainArea" index="3" unique_id=1254188347]
 position = Vector2(48, 32)
+control_lock_ticks = 34
+swim_entry_drop = true
 
 [node name="Camera2D" parent="Areas/MainArea" index="4" unique_id=254826152]
 position = Vector2(128, 120)

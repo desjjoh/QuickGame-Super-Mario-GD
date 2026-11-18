@@ -100,6 +100,10 @@ func _compare_swim(label: String, rows: Array) -> void:
 		)
 		checked += 1
 	assert(checked == rows.size())
+	if label == "odd_slot_turn":
+		swim._moving_direction = 0
+		blooper._swim_tick(1, 0)
+		assert(blooper._direction == -1)
 	await _retire(blooper)
 
 

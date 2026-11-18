@@ -19,11 +19,19 @@ func _ready() -> void:
 
 
 func _draw() -> void:
-	if Engine.is_editor_hint():
-		var guide := Color(0.25, 0.85, 1.0, 0.9)
-		draw_line(Vector2.ZERO, Vector2(width, 0), guide, 2.0)
-		for x in [0.0, width * 0.5, float(width)]:
-			draw_line(Vector2(x, -6), Vector2(x, 6), guide, 2.0)
+	if not Engine.is_editor_hint():
+		return
+	const TILE_SIZE := 16.0
+	var guide := Color(0.25, 0.85, 1.0, 0.9)
+	var center := width * 0.5
+	var center_tile_right := (floorf(center / TILE_SIZE) + 1.0) * TILE_SIZE
+	# The inclusive cutoff belongs to the final tile shown by the guide.
+	var last_tile_right := (floorf(width / TILE_SIZE) + 1.0) * TILE_SIZE
+	draw_line(Vector2.ZERO, Vector2(last_tile_right, 0), guide, 2.0)
+	for x: float in [0.0, center, last_tile_right]:
+		draw_line(Vector2(x, -6), Vector2(x, 6), guide, 2.0)
+	if center_tile_right < last_tile_right:
+		draw_line(Vector2(center_tile_right, -6), Vector2(center_tile_right, 6), guide, 2.0)
 
 
 func contains_player_x(body_x: float) -> bool:

@@ -19,9 +19,9 @@ Select a `BaseLevelArea` and set its **Theme** to Overworld, Underground, Castle
 
 Set **Background Music** independently to Overworld, Underground, Castle, Coin Heaven, Underwater, or None. Overworld is the default. 1-1 uses Underground in its secret area.
 
-Under **Movement**, enable **Swimming Enabled** to use swim movement and bubbles. 2-2 enables it in MainArea. The player sinks during the underwater arrival lock, gains swim control when it ends, and resumes land movement after emerging in SurfaceArea.
+Under **Movement**, enable **Swimming Enabled** to use swim movement and bubbles. 2-2 enables it in MainArea. The player sinks during the underwater arrival lock, gains swim control when it ends, and resumes land movement after emerging in SurfaceArea. The 2-2 Arrival endpoint enables **Swim Entry Drop** and sets **Control Lock Ticks** to 34. The player drops 49 px over 33 swim ticks, holds position on tick 34, and can steer or stroke with held input on tick 35. A swim stroke or landing returns the player to ordinary swim gravity.
 
-Place a `Whirlpool` scene anywhere under a swimming area to add a current. Its X position sets the left edge and **Width** sets the reach in pixels. The editor guide shows both edges and the center. The current spans the full water column, and the bottom input cutoff is measured from the area origin. Open `tests/fixtures/whirlpool_sandbox.tscn` to try the current in isolation.
+Place a `Whirlpool` scene anywhere under a swimming area to add a current. Its X position sets the left edge and **Width** sets the reach in pixels. The editor guide extends to the far edge of the tile containing the inclusive cutoff and marks the middle tile. The current spans the full water column, and the bottom input cutoff is measured from the area origin. Open `tests/fixtures/whirlpool_sandbox.tscn` to try the current in isolation.
 
 The underwater `GroundLayout` includes a solid **Reef** tile from the Pipes and Scenery atlas. In 2-2, the three currents begin at area-local X1040, X2080, and X2496 and span 96, 160, and 128 pixels respectively.
 
@@ -102,7 +102,7 @@ Paint one **Goomba Pair Spawner**, **Goomba Triplet Spawner**, or **Green Koopa 
 
 Paint **Red Koopa Spawner** on **EnemyLayout** in the cell immediately above its support. A walking Red Koopa turns at ledges, and its kicked shell can roll off them.
 
-Paint **Red Parakoopa Spawner** on **EnemyLayout** to place a Red Koopa that flies vertically. The marker sets its starting position. Its flight range follows the reference's starting-height rule. The first stomp removes its wings and awards 400 points, after which it walks and uses the shared shell states. In 1-3 the two markers are at (74, 4) and (114, 5).
+Paint **Red Parakoopa Spawner** on **EnemyLayout** to place a Red Koopa that flies vertically. The marker sets its starting position. Its flight range follows the reference's starting-height rule. The cyan guide marks the spawn point and both turning heights. Toggle **Show Flight Paths** on **EnemyLayout** to hide it. The first stomp removes its wings and awards 400 points, after which it walks and uses the shared shell states. In 1-3 the two markers are at (74, 4) and (114, 5).
 
 Paint **Green Parakoopa Spawner** on **EnemyLayout** for the hopping variant. Each marker activates one enemy at that cell. The 2-1 markers are at (151, 12), (169, 12), and (171, 12).
 
@@ -124,7 +124,7 @@ On a single lift, leave **Travel Distance** at −1 to use the original oscillat
 
 Set the single lift spawner to **Right on Landing** for a cloud platform. It waits at the marker, moves right at 1 px per tick after Mario lands, and keeps moving after he steps off. In 2-1, the medium platform is at (256, 160) in Coin Heaven.
 
-The 2D editor draws a cyan travel line and surfaces at the selected width. Single lifts show the travel span and starting surface. Repeating lanes show the full cycle and the starting surfaces from **Initial Offsets**.
+The 2D editor draws guides from the platform's left edge to its right edge at the travel limits. Vertical lifts show both sides of the travel lane. Single lifts mark the starting surface, and repeating lanes mark the starting surfaces from **Initial Offsets**. **Right on Landing** shows the direction of travel.
 
 ## Configure a vine reward
 

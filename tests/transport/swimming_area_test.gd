@@ -2,6 +2,8 @@ extends Node
 
 const GAME := preload("res://scenes/main/game.tscn")
 const STAGE := preload("res://scenes/levels/worlds/world 2/2-2.tscn")
+const ENTRY_TRACE := "res://tests/fixtures/swimming_reference/swim_entry_drop_mesen.csv"
+const HANDOFF_TICK := 34
 const MARIO := "res://scenes/player/mario/mario.tscn"
 const LUIGI := "res://scenes/player/luigi/luigi.tscn"
 
@@ -14,13 +16,15 @@ func _physics_process(_delta: float) -> void:
 
 func _ready() -> void:
 	process_physics_priority = 200
-	await _check_route(GameHandler.PlayerCharacter.MARIO, MARIO)
-	await _check_route(GameHandler.PlayerCharacter.LUIGI, LUIGI)
-	print("PASS: 2-2 swimming, surface exit, and Cheep Cheep stream boundaries.")
+	await _check_route(GameHandler.PlayerCharacter.MARIO, MARIO, true)
+	await _check_route(GameHandler.PlayerCharacter.LUIGI, LUIGI, false)
+	print("PASS: 2-2 entry drop, held controls, surface exit bubbles, and Cheep Cheep stream.")
 	await preload("res://tests/fixtures/finish_test.gd").finish(get_tree())
 
 
-func _check_route(character: GameHandler.PlayerCharacter, player_path: String) -> void:
+func _check_route(
+	character: GameHandler.PlayerCharacter, player_path: String, hold_through_handoff: bool
+) -> void:
 	var game := GAME.instantiate()
 	game.start_stage_override = null
 	game.start_with_title = true
@@ -49,31 +53,8 @@ func _check_route(character: GameHandler.PlayerCharacter, player_path: String) -
 	assert(water.area_id == &"main" and water.swimming_enabled)
 	var arrival := water.get_node("Arrival") as AreaEndpoint
 	var bubbles := water.get_node("WorldObjects/SwimBubbles") as SwimBubbleEmitter
-	assert(player.arrival_control_ticks_remaining == BasePlayer.ARRIVAL_CONTROL_TICKS)
-	Input.action_press(ControllerHandler.right_action)
-	Input.action_press(ControllerHandler.primary_action)
-	var previous_y := arrival.global_position.y
-	var sank_during_lock := false
-	for frame in range(180):
-		if player.arrival_control_ticks_remaining == 0:
-			break
-		assert(not player.can_read_controller_input())
-		var position := player.body.global_position
-		assert(is_equal_approx(position.x, arrival.global_position.x))
-		assert(position.y >= previous_y)
-		sank_during_lock = sank_during_lock or position.y > previous_y
-		previous_y = position.y
-		assert(bubbles._spawn_ticks == 0)
-		await tick_finished
-	Input.action_release(ControllerHandler.right_action)
-	Input.action_release(ControllerHandler.primary_action)
-	assert(sank_during_lock and player.arrival_control_ticks_remaining == 0)
-	for frame in range(4):
-		if player.state_machine.current_state is MarioSwimState:
-			break
-		await tick_finished
-	assert(player.state_machine.current_state is MarioSwimState)
-	assert(player.can_read_controller_input())
+	assert(player.arrival_control_ticks_remaining == HANDOFF_TICK)
+	await _check_entry_drop(player, arrival, bubbles, hold_through_handoff)
 
 	var bubble_seen := false
 	for frame in range(150):
@@ -118,6 +99,7 @@ func _check_route(character: GameHandler.PlayerCharacter, player_path: String) -
 			player.name, player.body.global_position - pipe.entry_position(),
 		]
 	)
+	await _check_exit_bubbles(player, bubbles, pipe)
 	for frame in range(360):
 		if (
 			level.active_area.area_id == &"surface"
@@ -143,6 +125,87 @@ func _check_route(character: GameHandler.PlayerCharacter, player_path: String) -
 	assert(player.state_machine.current_state is MarioJumpState and player.body.velocity.y < 0.0)
 	game.free()
 	await get_tree().process_frame
+
+
+func _check_exit_bubbles(player: Mario, bubbles: SwimBubbleEmitter, pipe: PipeEntrance) -> void:
+	# Place an existing bubble close enough to reach the HUD during the pipe animation.
+	for slot in bubbles._slots:
+		slot.hide()
+	var bubble := bubbles._slots[2]
+	bubble.global_position = Vector2(
+		pipe.global_position.x - 24.0,
+		bubbles.area.global_position.y + SwimBubbleEmitter.HUD_CUTOFF + 2.0
+	)
+	bubble.show()
+	bubbles._spawn_ticks = 0
+	var start_y := bubble.global_position.y
+	for _tick in range(12):
+		await tick_finished
+		assert(player.state_machine.current_state == player.pipe_enter_state)
+		assert(
+			not bubbles._slots[0].visible and not bubbles._slots[1].visible,
+			"A new bubble appeared during pipe entry."
+		)
+	assert(bubble.global_position.y < start_y, "An existing bubble froze during pipe entry.")
+	assert(not bubble.visible, "An existing bubble did not release at the HUD cutoff.")
+
+
+func _check_entry_drop(
+	player: Mario, arrival: AreaEndpoint, bubbles: SwimBubbleEmitter, hold_through_handoff: bool
+) -> void:
+	Input.action_press(ControllerHandler.right_action)
+	Input.action_press(ControllerHandler.primary_action)
+	for frame in range(120):
+		if player.state_machine.current_state is MarioSwimState:
+			break
+		await tick_finished
+	var swim := player.state_machine.current_state as MarioSwimState
+	assert(swim != null)
+	var trace := FileAccess.open(ENTRY_TRACE, FileAccess.READ)
+	assert(trace != null)
+	trace.get_csv_line()
+	for frame in range(1, 66):
+		var row := trace.get_csv_line()
+		assert(row.size() == 3 and int(row[0]) == frame)
+		assert(player.arrival_control_ticks_remaining == maxi(0, HANDOFF_TICK - frame))
+		if frame < HANDOFF_TICK:
+			assert(not player.can_read_controller_input() and bubbles._spawn_ticks == 0)
+		else:
+			assert(player.can_read_controller_input())
+		var offset := player.body.global_position - arrival.global_position
+		var speed_units := roundi(player.body.velocity.y * 256.0 / 60.0)
+		assert(
+			absf(offset.x) < 0.1 and absf(offset.y - float(row[1])) < 0.1,
+			"2-2 drop tick %d at %s, expected Y%s" % [frame, offset, row[1]]
+		)
+		assert(speed_units == int(row[2]), "2-2 drop speed at tick %d" % frame)
+		assert(swim._stroke_ticks == 0)
+		if frame == HANDOFF_TICK:
+			if hold_through_handoff:
+				await _check_held_handoff(player, swim, arrival)
+				return
+			Input.action_release(ControllerHandler.right_action)
+			Input.action_release(ControllerHandler.primary_action)
+		if frame != 65:
+			await tick_finished
+	assert(player.has_floor_support() and swim._sink_force == MarioSwimState.SINK_FORCE)
+
+
+func _check_held_handoff(player: Mario, swim: MarioSwimState, arrival: AreaEndpoint) -> void:
+	await tick_finished
+	assert(not ControllerHandler.input_primary_just_pressed)
+	assert(swim._stroke_ticks == MarioSwimState.STROKE_TICKS)
+	assert(player.body.global_position.y - arrival.global_position.y == 47.0)
+	assert(roundi(player.body.velocity.y * 256.0 / 60.0) == -371)
+	assert(player.body.velocity.x == 60.0 / 16.0)
+	assert(player.horizontal_movement._speed_fraction == 48)
+	assert(player.horizontal_movement._position_fraction == 16)
+	assert(player.body.global_position.x == arrival.global_position.x)
+	await tick_finished
+	assert(swim._stroke_ticks == MarioSwimState.STROKE_TICKS - 1)
+	assert(player.body.velocity.x > 0.0)
+	Input.action_release(ControllerHandler.right_action)
+	Input.action_release(ControllerHandler.primary_action)
 
 
 func _check_cheep_cheep_stream(

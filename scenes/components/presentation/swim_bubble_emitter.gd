@@ -40,25 +40,30 @@ func _physics_process(_delta: float) -> void:
 		or player.is_shutdown
 		or player.gameplay_suspended
 		or player.activity_suspended
-		or player.arrival_control_ticks_remaining > 0
 		or not area.is_active
 		or area.actors_suspended
-		or not player.state_machine.current_state is MarioSwimState
 	):
 		return
-	_advance()
+	# Bubbles already in the water keep rising while Mario enters a pipe.
+	var can_emit := (
+		player.arrival_control_ticks_remaining <= 0
+		and player.state_machine.current_state is MarioSwimState
+	)
+	if can_emit or _slots.any(func(slot: Sprite2D) -> bool: return slot.visible):
+		_advance(can_emit)
 
 
-func _advance() -> void:
+func _advance(can_emit: bool) -> void:
 	var feedback := ((_random_register >> 25) ^ (_random_register >> 17)) & 1
 	_random_register = (_random_register >> 1) | (feedback << 31)
-	_spawn_ticks = maxi(_spawn_ticks - 1, 0)
+	if can_emit:
+		_spawn_ticks = maxi(_spawn_ticks - 1, 0)
 	var area_origin := area.global_position
 	for index in range(SLOT_COUNT - 1, -1, -1):
 		var bit := (_random_register >> ((SLOT_COUNT - 1 - index) * 8)) & 1
 		var bubble := _slots[index]
 		if not bubble.visible:
-			if _spawn_ticks != 0:
+			if not can_emit or _spawn_ticks != 0:
 				continue
 			var feet := player.body.global_position - area_origin
 			var origin := area_origin + Vector2(floorf(feet.x), roundf(feet.y))

@@ -86,7 +86,8 @@ func _swim_tick(tick: int, turn_sample: int) -> void:
 func _player_moving_direction(player: BasePlayer) -> int:
 	var swim := player.state_machine.current_state as MarioSwimState
 	if swim != null:
-		return swim.get_moving_direction()
+		# The NES swims left for any direction byte other than Right, including unset.
+		return 1 if swim.get_moving_direction() == 1 else -1
 	if not is_zero_approx(player.body.velocity.x):
 		return -1 if player.body.velocity.x < 0.0 else 1
 	return -1 if player.sprite.flip_h else 1

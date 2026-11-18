@@ -9,6 +9,7 @@ const SURFACE_FEET_Y := NES_FEET_OFFSET + 20.0
 const INPUT_CUTOFF_Y := NES_FEET_OFFSET + 208
 const STROKE_FORCE := 0x0d
 const SINK_FORCE := 0x0a
+const ENTRY_SINK_FORCE := 0x28
 const WHIRLPOOL_STROKE_FORCE := 0x04
 const WHIRLPOOL_SINK_FORCE := 0x09
 const SURFACE_FORCE := 0x18
@@ -18,6 +19,7 @@ var _area: BaseLevelArea
 var _in_whirlpool := false
 var _blocked_direction := 0
 var _sink_force := SINK_FORCE
+var _entry_handoff_pending := false
 var _stroke_ticks := 0
 var _stroke_origin_y := 0.0
 var _previous_jump := false
@@ -33,12 +35,19 @@ func enter() -> void:
 	_surface_y = _area.global_position.y + SURFACE_FEET_Y
 	_in_whirlpool = false
 	_blocked_direction = 0
-	_sink_force = SINK_FORCE
+	var endpoint := level.active_endpoint
+	_entry_handoff_pending = (
+		is_instance_valid(endpoint) and endpoint.swim_entry_drop
+		and player.arrival_control_ticks_remaining > 0
+	)
+	_sink_force = ENTRY_SINK_FORCE if _entry_handoff_pending else SINK_FORCE
 	_stroke_ticks = 0
 	_stroke_origin_y = player.body.global_position.y
 	_previous_jump = false
 	_vertical_force = SINK_FORCE
-	_moving_direction = -1 if player.sprite.flip_h else 1
+	var facing := -1 if player.sprite.flip_h else 1
+	# A water entrance faces right before the first sideways input sets a movement direction.
+	_moving_direction = 0 if _entry_handoff_pending else facing
 	player.horizontal_movement.reset_fractional_step()
 
 
@@ -59,15 +68,23 @@ func accepts_depth_input() -> bool:
 
 func process_physics(delta: float) -> BaseState:
 	var player := get_player() as Mario
+	if _entry_handoff_pending and player.arrival_control_ticks_remaining == 1:
+		# The entrance routine spends its last tick handing over control.
+		return null
 	var previous_speed := player.body.velocity.x
 	var direction := int(signf(get_movement_axis().x))
 	var grounded := player.has_floor_support()
 	var controls := controller_controls_available()
 	var jump := controls and ControllerHandler.input_primary
+	var jump_pressed := ControllerHandler.input_primary_just_pressed
+	if _entry_handoff_pending and controls:
+		# Suppressed inputs leave Jump unpressed until the first controllable tick.
+		jump_pressed = jump_pressed or jump
+		_entry_handoff_pending = false
 	var near_surface := player.body.global_position.y < _surface_y
 	_stroke_ticks = maxi(_stroke_ticks - 1, 0)
 	if (
-		controls and ControllerHandler.input_primary_just_pressed
+		controls and jump_pressed
 		and (grounded or _stroke_ticks > 0 or player.body.velocity.y >= 0.0)
 	):
 		_stroke_ticks = STROKE_TICKS
@@ -100,6 +117,8 @@ func process_physics(delta: float) -> BaseState:
 		)
 	_previous_jump = jump
 	_move(player, grounded, direction, delta)
+	if _sink_force == ENTRY_SINK_FORCE and player.has_floor_support():
+		_sink_force = SINK_FORCE
 	_apply_whirlpool(player)
 	if player.form_controller.is_crouched and not player.has_floor_support():
 		player.form_controller.set_crouched(false)
