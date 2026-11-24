@@ -1,0 +1,5 @@
+case,launch_speed,player_x,held_oam_attributes,next_oam_attributes
+rightward_hit_from_left,2,120,2,130
+rightward_hit_from_right,2,136,2,194
+leftward_hit_from_left,-2,120,66,130
+leftward_hit_from_right,-2,136,66,194

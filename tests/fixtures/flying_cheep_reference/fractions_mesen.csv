@@ -1,0 +1,15 @@
+case,tick,x,y,x_fraction,position_fraction
+fresh_slot_fractions,0,81,243,192,0
+fresh_slot_fractions,1,83,238,128,29
+fresh_slot_fractions,2,85,233,64,71
+fresh_slot_fractions,3,87,228,0,126
+fresh_slot_fractions,4,88,223,192,194
+fresh_slot_fractions,5,90,219,128,19
+fresh_slot_fractions,6,92,214,64,113
+retained_slot_fractions,0,82,243,63,208
+retained_slot_fractions,1,83,238,255,237
+retained_slot_fractions,2,85,234,191,23
+retained_slot_fractions,3,87,229,127,78
+retained_slot_fractions,4,89,224,63,146
+retained_slot_fractions,5,90,219,255,227
+retained_slot_fractions,6,92,215,191,65

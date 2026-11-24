@@ -13,6 +13,10 @@ var launch_position_fraction := 0
 var launch_direction := 1.0
 var fireball_launch := false
 var star_launch := false
+## Fractional fall from rest, holding the hit-frame pose like a Starman hit.
+var stomp_launch := false
+## A shell can strike an actor after its movement already ran this tick.
+var defer_launch_step := false
 
 var _elapsed := 0.0
 var _velocity := Vector2.ZERO
@@ -27,29 +31,30 @@ func enter() -> void:
 	_elapsed = 0.0
 	_velocity = Vector2(horizontal_speed * launch_direction, launch_speed)
 	(entity as BaseEnemy).body.velocity = Vector2.ZERO
-	if star_launch:
+	if star_launch or stomp_launch or defer_launch_step:
 		_star_pose.capture(entity.sprite)
 	else:
 		_apply_launch_pose()
-	if fireball_launch or star_launch:
+	if fireball_launch or star_launch or stomp_launch:
 		_launch_hit_tick = Engine.get_physics_frames()
 		_speed_units = roundi(launch_speed / 60.0 * 256.0) + launch_speed_fraction
 		_position_fraction = launch_position_fraction
 		_sprite_anchor = entity.sprite.position
 		(entity as BaseEnemy).body.position.y -= 2.0
-		_advance_fractional_launch()
-		if star_launch:
+		if not defer_launch_step:
+			_advance_fractional_launch()
+		if star_launch or stomp_launch or defer_launch_step:
 			_star_pose.hold_after_motion(entity.sprite, (entity as BaseEnemy).body)
 		entity.reset_physics_interpolation()
 
 
 func _apply_launch_pose() -> void:
-	entity.sprite.flip_v = launch_speed != 0.0
+	entity.sprite.flip_v = launch_speed != 0.0 or stomp_launch
 	entity.sprite.position.y += defeat_sprite_y_offset
 
 
 func process_physics(delta: float) -> BaseState:
-	if fireball_launch or star_launch:
+	if fireball_launch or star_launch or stomp_launch:
 		if Engine.get_physics_frames() != _launch_hit_tick:
 			var reveal := _star_pose.is_holding()
 			if reveal:
@@ -86,5 +91,5 @@ func _advance_fractional_launch() -> void:
 func exit() -> void:
 	if _star_pose.is_holding():
 		_star_pose.cancel(entity.sprite)
-	elif fireball_launch or star_launch:
+	elif fireball_launch or star_launch or stomp_launch:
 		entity.sprite.position = _sprite_anchor

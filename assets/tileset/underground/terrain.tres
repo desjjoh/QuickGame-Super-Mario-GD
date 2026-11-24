@@ -52,8 +52,15 @@ texture = ExtResource("spent_art")
 3:0/0 = 0
 3:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
 
+[sub_resource type="TileSetAtlasSource" id="bridge_deck"]
+resource_name = "Bridge deck"
+texture = ExtResource("art_2")
+2:1/0 = 0
+2:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+
 [resource]
 physics_layer_0/collision_layer = 1
 sources/0 = SubResource("Source_0")
 sources/1 = SubResource("Source_1")
 sources/3 = SubResource("spent_question_block")
+sources/6 = SubResource("bridge_deck")

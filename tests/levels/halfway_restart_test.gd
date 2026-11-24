@@ -10,6 +10,10 @@ func _physics_process(_delta: float) -> void:
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	process_physics_priority = 200
+	# Keep repeated death and camera checks within the runner's frame budget.
+	var definition := GameHandler.transitions.get_definition(&"level") as TransitionDefinition
+	var card_frames := definition.stages[0].minimum_frames
+	definition.stages[0].minimum_frames = 8
 	var game := preload("res://scenes/main/game.tscn").instantiate()
 	game.start_stage_override = null
 	game.start_with_title = false
@@ -49,10 +53,12 @@ func _ready() -> void:
 	await _check_1_2(game)
 	await _check_1_3(game)
 	await _check_2_2(game)
+	await _check_2_3(game)
+	definition.stages[0].minimum_frames = card_frames
 	game.free()
 	await tick_finished
 	print(
-		"PASS: World 1 and 2-2 halfway thresholds, left limits, repeat deaths, and side-area framing."
+		"PASS: World 1, 2-2 and 2-3 halfway thresholds, left limits, repeat deaths, and side-area framing."
 	)
 	await preload("res://tests/fixtures/finish_test.gd").finish(get_tree())
 
@@ -174,6 +180,38 @@ func _check_2_2(game: Node) -> void:
 	assert(level.active_area.area_id == &"surface")
 	level = await _restart(level, 1328.0, 1280.0)
 	assert(level.entry_mode == BaseLevel.EntryMode.HALFWAY_RESPAWN)
+
+
+func _check_2_3(game: Node) -> void:
+	var scene := preload("res://scenes/levels/worlds/world 2/2-3.tscn")
+	var stage_index: int = game.stages.find(scene)
+	GameHandler.set_lives(4)
+	assert(GameHandler.load_level(scene, true, stage_index, BaseLevel.EntryMode.RESPAWN))
+	var level := await _wait_for_level_start()
+	assert(level.stage_label == "2-3" and _spawn_matches(level, 48.0, 0.0))
+	_set_camera_left(1791.0)
+	level = await _restart(level, 48.0, 0.0)
+	_set_camera_left(1792.0)
+	level = await _restart(level, 1840.0, 1792.0)
+	assert(level.entry_mode == BaseLevel.EntryMode.HALFWAY_RESPAWN)
+	var source := level.world_objects.get_node("FlyingCheepCheepSpawner") as FlyingCheepCheepSpawner
+	assert(not source._active and source._fish_slots.is_empty())
+	# Reaching the next streamed start column must enable fish after a restart.
+	_set_camera_left(1829.0)
+	level.player.set_physics_process(false)
+	for _tick in range(8):
+		await tick_finished
+	assert(source._active and source._fish_slots.size() == 1)
+	_set_camera_left(2001.0)
+	for _tick in range(8):
+		await tick_finished
+	assert(is_instance_valid(source._submerged))
+	level = await _restart(level, 1840.0, 1792.0)
+	source = level.world_objects.get_node("FlyingCheepCheepSpawner") as FlyingCheepCheepSpawner
+	assert(not source._active and source._fish_slots.is_empty())
+	assert(source._slot_fractions == [Vector2i.ZERO, Vector2i.ZERO, Vector2i.ZERO])
+	assert(not is_instance_valid(source._submerged) and not source._submerged_attempted)
+	assert(level.player.can_read_controller_input())
 
 
 func _find_1_2_triplet(level: BaseLevel) -> EntitySpawner:

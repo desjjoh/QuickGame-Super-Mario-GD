@@ -332,8 +332,9 @@ func enemy_outside_cleanup(enemy: BaseEnemy) -> bool:
 	var right := floorf(view.end.x) - 1.0
 	return (
 		enemy.is_outside_horizontal_cleanup(left, right)
-		or enemy.get_activity_rect().end.y <= get_activity_region(true).position.y
-		or enemy.get_activity_rect().position.y >= get_activity_region(true).end.y
+		or enemy.is_outside_vertical_cleanup(
+			get_activity_region(true).position.y, get_activity_region(true).end.y
+		)
 	)
 
 
