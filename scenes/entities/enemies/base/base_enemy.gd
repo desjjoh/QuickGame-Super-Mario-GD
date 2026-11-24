@@ -12,6 +12,8 @@ const PLAYER_CONTACT := preload("res://scenes/components/interactions/player_con
 const STOMP_REBOUND := -240.0
 const RISING_REWARD_POPUP := preload("res://scenes/components/presentation/rising_reward_popup.gd")
 
+@export var stomp_rebound := STOMP_REBOUND
+
 @onready var body: CharacterBody2D = $Body
 @onready var _enemy_contact_area: Area2D = $Body/EnemyContact
 @onready var _player_contact_area := get_node_or_null("Body/PlayerContact") as Area2D
@@ -68,7 +70,7 @@ func _check_normal_player_contact(player: BasePlayer) -> void:
 		return
 	if player.last_enemy_stomp_tick == Engine.get_physics_frames():
 		# The rebound changes velocity immediately, but this contact still belongs to the fall.
-		if player.enemy_stomp_started_descending:
+		if _can_follow_stomp(player):
 			_player_contact_latched = _receive_stomp(player)
 		return
 	_player_contact_latched = true
@@ -94,8 +96,7 @@ func _handle_player_contact(player: BasePlayer) -> void:
 	if _can_stomp(player) and _receive_stomp(player):
 		player.last_enemy_stomp_tick = Engine.get_physics_frames()
 		player.enemy_stomp_started_descending = descending
-		player.body.velocity.y = STOMP_REBOUND
-		player.jump_action.use_falling_gravity(player.motion_values)
+		_apply_stomp_rebound(player)
 		player.play_sound_effect(SoundHandler.get_sound(&"stomp"))
 	else:
 		# Damage is guarded by the player, rather than the interaction latch.
@@ -103,6 +104,15 @@ func _handle_player_contact(player: BasePlayer) -> void:
 		# dangerous again when its protection ends. Stomps/kicks retain their latch.
 		_player_contact_latched = false
 		player.receive_damage(self)
+
+
+func _apply_stomp_rebound(player: BasePlayer) -> void:
+	player.body.velocity.y = stomp_rebound
+	player.jump_action.use_falling_gravity(player.motion_values)
+
+
+func _can_follow_stomp(player: BasePlayer) -> bool:
+	return player.enemy_stomp_started_descending
 
 
 func _receive_stomp(player: BasePlayer) -> bool:
@@ -226,6 +236,12 @@ func is_outside_horizontal_cleanup(left: float, right: float) -> bool:
 	var anchor := floorf(body.global_position.x - 8.0)
 	var right_extension := 73.0 if left >= 73.0 else 72.0
 	return anchor < left - 73.0 or anchor >= right + right_extension
+
+
+## Ordinary actors use the area's buffered top and bottom boundaries.
+func is_outside_vertical_cleanup(top: float, bottom: float) -> bool:
+	var bounds := get_activity_rect()
+	return bounds.end.y <= top or bounds.position.y >= bottom
 
 
 func away_from_attacker(hit: EntityHit) -> float:

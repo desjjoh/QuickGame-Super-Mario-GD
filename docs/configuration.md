@@ -17,6 +17,8 @@ Use Godot’s **Project → Project Settings → Input Map** to inspect bindings
 
 Select a `BaseLevelArea` and set its **Theme** to Overworld, Underground, Castle, or Underwater. The theme supplies compatible ground, decoration, and entity TileSets, plus entity and UI artwork. Keep source IDs and atlas coordinates compatible across themes so painted layouts survive a theme change.
 
+Paint **Bridge deck** on **GroundLayout** for a solid bridge tile. Paint **Bridge railings** on **DecorationLayout**, one row above the deck, for the non-colliding guardrail. Both entries use compatible source IDs across all four themes.
+
 Set **Background Music** independently to Overworld, Underground, Castle, Coin Heaven, Underwater, or None. Overworld is the default. 1-1 uses Underground in its secret area.
 
 Under **Movement**, enable **Swimming Enabled** to use swim movement and bubbles. 2-2 enables it in MainArea. The player sinks during the underwater arrival lock, gains swim control when it ends, and resumes land movement after emerging in SurfaceArea. The 2-2 Arrival endpoint enables **Swim Entry Drop** and sets **Control Lock Ticks** to 34. The player drops 49 px over 33 swim ticks, holds position on tick 34, and can steer or stroke with held input on tick 35. A swim stroke or landing returns the player to ordinary swim gravity.
@@ -64,7 +66,7 @@ Open `scenes/main/game.tscn`, select **Game**, and assign **Presentation → Tit
 
 Add a `Marker2D` under **Players** at the desired feet position and assign it to the level's **Death → Halfway Spawn** field. On **Areas → MainArea → Camera2D**, enable **Halfway Restart → Halfway Check Enabled** and set **Halfway Camera Left** in pixels from the main area's origin. The 2D editor draws a labeled dashed guide that moves with the area. At life loss, the active camera and the threshold are compared in world coordinates.
 
-1-1 uses a marker at `(1328, 208)` and a camera-left threshold of `1280`. 1-2 uses `(1584, 208)` and `1536`. 1-3 uses `(1072, 208)` and `1024`. 2-2 uses `(1328, 208)` and `1280`. These coordinates are relative to each stage's main area. At a halfway restart, the camera starts at the threshold and Mario's sprite starts 40 px from the left edge. Main-area deaths before the threshold use PlayerSpawn. Side-area deaths use the active camera's world position, so 1-1's authored secret room restarts at PlayerSpawn and 1-2's authored bonus room uses the halfway marker. 2-2 restarts underwater after losing a life on the surface.
+1-1 uses a marker at `(1328, 208)` and a camera-left threshold of `1280`. 1-2 uses `(1584, 208)` and `1536`. 1-3 uses `(1072, 208)` and `1024`. 2-2 uses `(1328, 208)` and `1280`. 2-3 uses `(1840, 208)` and `1792`. These coordinates are relative to each stage's main area. At a halfway restart, the camera starts at the threshold and Mario's sprite starts 40 px from the left edge. Main-area deaths before the threshold use PlayerSpawn. Side-area deaths use the active camera's world position, so 1-1's authored secret room restarts at PlayerSpawn and 1-2's authored bonus room uses the halfway marker. 2-2 restarts underwater after losing a life on the surface.
 
 On the first main-area load of a halfway restart, EnemyLayout placements with a spawn trigger left of the last visible pixel are skipped for that area load. In 1-2 this skips the Goomba triplet near the checkpoint. Enemies with triggers at or beyond the right edge and occupants attached to pipes can spawn normally.
 
@@ -92,7 +94,7 @@ The game uses 256×240 logical framing with window-resolution canvas_items rende
 
 ## Source configuration and ownership
 
-`Game.stages` defines completion order and lists 1-1, 1-2, 1-3, 1-4, 2-1, and 2-2. Clearing the final registered stage returns to the title. **Game → Start Stage Override** selects the starting BaseLevel scene for new runs. Leave it empty to use the first entry. Selecting a registered scene starts at its position in the list. A scene outside the list returns to the title after ordinary completion. The title backdrop is configured separately. Single-stage test fixtures assign `game.stages.assign([scene])`.
+`Game.stages` defines completion order and lists 1-1, 1-2, 1-3, 1-4, 2-1, 2-2, and 2-3. Clearing the final registered stage returns to the title. **Game → Start Stage Override** selects the starting BaseLevel scene for new runs. Leave it empty to use the first entry. Selecting a registered scene starts at its position in the list. A scene outside the list returns to the title after ordinary completion. The title backdrop is configured separately. Single-stage test fixtures assign `game.stages.assign([scene])`.
 
 Use typed GameHandler methods/properties and `player_status` for score, coins, lives, form, top score, stage label, and timer values. Generic `set_session_value()` / `get_session_value()` are for run metadata such as area/arrival IDs; reserved-key writes are rejected. The existing `session_value_changed` signal carries both typed-value and metadata notifications.
 
@@ -143,6 +145,15 @@ Set the cloud area's **Fall Destination** to the main area's return endpoint. Th
 ## Paint springboards
 
 Paint **Springboard** on **EntityLayout**. The painted cell is the top of the uncompressed spring. In 2-1 it is at (188, 11), before the wall at columns 190–191. Jump onto it and press Jump again during compression for the high bounce.
+
+## Try flying Cheep Cheeps
+
+Open `tests/fixtures/flying_cheep_cheep_sandbox.tscn` and press F6. Its two placed fish claim ordinary enemy slots and finish one flight each. Restart the scene to try again. The bridge is solid for Mario and does not block the fish. **Launch Velocity** uses pixels per 60 Hz physics tick; the initial fraction properties support matching reused NES slot state. The actor's stomp rebound is -180 px/s, equivalent to the reference's -3 integer speed byte. For an ongoing stream, open `tests/fixtures/flying_cheep_cheep_spawner_sandbox.tscn` and press F6.
+
+
+Instance `scenes/entities/spawners/flying_cheep_cheep_spawner.tscn` under an area's **WorldObjects**. Its map-column properties are measured from the marker's area-local X, in 16 px columns. **Start Column** starts the stream; **Stop Column** stops new launches while existing fish finish their flights. Leave Stop Column at -1 for an endless sandbox stream. **Restart Columns** supplies additional start commands for a halfway entry beyond the first start. The editor guides mark the camera-left positions where those columns begin streaming; the queued command takes effect on a later enemy update.
+
+2-3 uses Start Column 26, Restart Columns `[137]`, and Stop Column 197. The start guides are at camera X64 and X1824; the stop guide is at X2784. The shared column clock models the two columns parsed over eight tasks for every 32 px of forward camera movement. At the halfway camera X1792, the stream waits for the second start command. Fish use only enemy slots 0–2, respect **Game → Enemy Limit**, and retain position fractions when a flying fish reuses its slot. Cooldowns are selected from 16, 96, 32, and 72 ticks. Launch offsets and horizontal speeds depend on Mario's speed and three random bytes. Pause and gameplay suspension freeze the source; area unloading removes the source and its fish. Set **Submerged Swimmer Origin** to a marker-relative NES origin to enable an ordinary below-screen swimming entry; negative X disables it. 2-3 uses `(2304, 248)`. The entry shares the enemy registry, activates through the same 48 px column lookahead, and is skipped if it has already passed the visible right edge. It swims left and bobs according to its slot; horizontal cleanup or NES Y256 retirement releases it. It does not respawn during the same area visit. Depending on the available slot and initial bob direction, its lifetime varies; it temporarily reduces flying capacity when assigned slot 0, 1 or 2.
 
 ## Place a castle bridge
 

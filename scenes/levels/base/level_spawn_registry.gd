@@ -20,6 +20,23 @@ func get_slot(category: StringName, actor: Node) -> int:
 	return _spawn_slots.get(category, {}).get(actor, -1)
 
 
+## Lowest free category slot, or -1 when full or not slot-tracked.
+func get_next_free_slot(category: StringName) -> int:
+	var slots: Dictionary = _spawn_slots.get(category, {})
+	for slot in range(maxi(0, _get_limit(category))):
+		if not slots.values().has(slot):
+			return slot
+	return -1
+
+
+## Release a retiring actor's identity before deferred destruction completes.
+func release(category: StringName, actor: Node) -> void:
+	var live: Array = _live_spawns.get(category, [])
+	var slots: Dictionary = _spawn_slots.get(category, {})
+	live.erase(actor)
+	slots.erase(actor)
+
+
 ## Claim immediately before adding a new actor to the tree.
 func try_claim(category: StringName, actor: Node, replace_oldest := false) -> bool:
 	var limit := _get_limit(category)
@@ -38,10 +55,7 @@ func try_claim(category: StringName, actor: Node, replace_oldest := false) -> bo
 				previous.hide()
 		live.append(actor)
 		# Keep the age-ordered list intact: replacement still removes the oldest.
-		for slot in range(limit):
-			if not slots.values().has(slot):
-				slots[actor] = slot
-				break
+		slots[actor] = get_next_free_slot(category)
 		actor.tree_exited.connect(_release_spawn_slot.bind(category, actor), CONNECT_ONE_SHOT)
 	return true
 
@@ -67,5 +81,4 @@ func _get_limit(category: StringName) -> int:
 
 
 func _release_spawn_slot(category: StringName, actor: Node) -> void:
-	_live_spawns[category].erase(actor)
-	_spawn_slots[category].erase(actor)
+	release(category, actor)

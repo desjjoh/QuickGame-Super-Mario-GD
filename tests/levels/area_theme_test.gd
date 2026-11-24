@@ -7,6 +7,7 @@ func _ready() -> void:
 	var overworld := load("res://assets/themes/overworld.tres") as AreaTheme
 	var underwater := load("res://assets/themes/underwater.tres") as AreaTheme
 	_check_variant_markers([overworld, underground, castle, underwater])
+	_check_bridge_parts([overworld, underground, castle, underwater])
 	var preview := (
 		preload("res://scenes/levels/areas/base_area.tscn").instantiate() as BaseLevelArea
 	)
@@ -55,8 +56,8 @@ func _ready() -> void:
 		underground_castle.get_tile_data(Vector2i.ZERO, 0).get_custom_data("entity_id") == "castle"
 	)
 	assert(castle.title_accent_font != null)
-	assert(castle.terrain.get_source_count() == 3)
-	assert(castle.decorations.get_source_count() == 7)
+	assert(castle.terrain.get_source_count() == 4)
+	assert(castle.decorations.get_source_count() == 8)
 	for source_id in [3, 4, 5, 6]:
 		var marker := castle.entity_markers.get_source(source_id) as TileSetAtlasSource
 		assert(marker.texture.resource_path.contains("/castle/"))
@@ -148,7 +149,7 @@ func _ready() -> void:
 			"/palettes/underground/"
 		)
 	)
-	assert(main_terrain.get_source_count() == 5 and lower_ground.tile_set.get_source_count() == 3)
+	assert(main_terrain.get_source_count() == 6 and lower_ground.tile_set.get_source_count() == 4)
 	assert(main_terrain.has_source(2) and not lower_ground.tile_set.has_source(2))
 	for source_id in [0, 1]:
 		var original := main_terrain.get_source(source_id) as TileSetAtlasSource
@@ -168,9 +169,9 @@ func _ready() -> void:
 			and lower_decorations.get_physics_layers_count() == 0
 		)
 	)
-	assert(main_decorations.get_source_count() == 8 and lower_decorations.get_source_count() == 7)
+	assert(main_decorations.get_source_count() == 9 and lower_decorations.get_source_count() == 8)
 	assert(main_decorations.has_source(16) and not lower_decorations.has_source(16))
-	for id in [0, 3, 9, 17]:
+	for id in [0, 3, 9, 17, 21]:
 		assert(lower_decorations.has_source(id))
 		var original := main_decorations.get_source(id) as TileSetAtlasSource
 		var themed := lower_decorations.get_source(id) as TileSetAtlasSource
@@ -352,3 +353,17 @@ func _check_variant_marker(
 	assert(art.region.position == Vector2(marker_region.position))
 	assert(entity.sprite.get_rect().size == Vector2(marker_region.size))
 	entity.free()
+
+
+func _check_bridge_parts(themes: Array[AreaTheme]) -> void:
+	for theme in themes:
+		var palette_path := "/%s/tileset/" % theme.display_name.to_lower()
+		var deck := theme.terrain.get_source(6) as TileSetAtlasSource
+		assert(deck.texture.resource_path.contains(palette_path))
+		var deck_tile := deck.get_tile_data(Vector2i(2, 1), 0)
+		assert(deck_tile.get_collision_polygons_count(0) == 1)
+		assert(not deck_tile.is_collision_polygon_one_way(0, 0))
+		var railings := theme.decorations.get_source(21) as TileSetAtlasSource
+		assert(railings.texture.resource_path.contains(palette_path))
+		assert(railings.has_tile(Vector2i(0, 2)))
+		assert(theme.decorations.get_physics_layers_count() == 0)

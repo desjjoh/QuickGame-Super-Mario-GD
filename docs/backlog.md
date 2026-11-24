@@ -29,5 +29,4 @@ Keep the accepted cached audio. Live shared noise-channel playback was removed a
 ## Verification
 
 - Requalify the full suite when requested. The game-over, jump benchmark, timer fixture, Mario form fixture, and resolution-aware shadow checks now pass their focused checks.
-- Resolve the default audio bus layout by resource path on a fresh import. A clean copy reports an unrecognized audio layout UID before the cache is populated. Using the layout's resource path in a separate copy imports without errors.
 - Investigate native shutdown failures if reproducible. Regression teardown addresses the isolated deferred audio cleanup warnings; this does not certify every native shutdown path.

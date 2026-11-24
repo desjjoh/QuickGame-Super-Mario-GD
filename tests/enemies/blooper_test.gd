@@ -1,5 +1,7 @@
 extends Node
 
+signal tick_finished
+
 const SANDBOX := preload("res://tests/fixtures/swim_sandbox.tscn")
 const SHOT := preload("res://scenes/entities/projectiles/fireball.tscn")
 const SUPER := preload("res://assets/player/forms/super.tres")
@@ -16,7 +18,12 @@ const SEEDS := {
 }
 
 
+func _physics_process(_delta: float) -> void:
+	tick_finished.emit()
+
+
 func _ready() -> void:
+	process_physics_priority = 200
 	var movement := _read_traces("blooper_mesen.csv", 13)
 	var defeats := _read_traces("blooper_defeat_mesen.csv", 5)
 	assert(movement.size() == 6 and defeats.size() == 2)
@@ -141,8 +148,7 @@ func _compare_defeat(label: String, rows: Array) -> void:
 		assert(GameHandler.player_status.score == original_score + int(row[4]))
 		if int(row[1]) > 0:
 			assert(blooper.sprite.flip_v)
-		await get_tree().physics_frame
-		await get_tree().process_frame
+		await tick_finished
 		blooper._physics_process(STEP)
 	await _retire(blooper)
 
