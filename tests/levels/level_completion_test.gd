@@ -169,7 +169,41 @@ func _ready() -> void:
 	assert(GameHandler.current_level.scene_file_path == "res://tests/fixtures/sandbox_level.tscn")
 	game.free()
 	await ticks(2)
+	await _check_registered_world_two_handoff()
 	print(
 		"PASS: stage order, duplicate/death/transport gates, cancellation recovery, carried player status, progress reset, final/unlisted title return and stale observer safety."
 	)
 	await preload("res://tests/fixtures/finish_test.gd").finish(get_tree())
+
+
+func _check_registered_world_two_handoff() -> void:
+	var game: Node = load("res://scenes/main/game.tscn").instantiate()
+	var source := load("res://scenes/levels/worlds/world 2/2-2.tscn") as PackedScene
+	var destination := load("res://scenes/levels/worlds/world 2/2-3.tscn") as PackedScene
+	var source_index: int = game.stages.find(source)
+	var destination_index: int = game.stages.find(destination)
+	assert(source_index >= 0 and destination_index == source_index + 1)
+	game.start_with_title = false
+	game.start_stage_override = destination
+	game.transitions_enabled = false
+	add_child(game)
+	var level := GameHandler.current_level
+	assert(level.stage_label == "2-3" and level.active_area.area_id == &"main")
+	assert(level.active_area.theme.display_name == "Overworld")
+	assert(not level.active_area.swimming_enabled)
+	var ending := level.ending_presentation as FlagpoleEndingPresentation
+	var castle := level.world_objects.get_node("large_castle_230_2") as CastleEntity
+	var pole := level.world_objects.get_node("flagpole_224_2") as FlagpoleEntity
+	assert(ending != null and ending._castle == castle)
+	assert(pole.climb_top.global_position.x == 3608.0)
+	assert(castle.doorway.global_position.y == 208.0)
+	assert(GameHandler.time_remaining == level.starting_time)
+	await ticks(2)
+	assert(level.player.body.global_position.is_equal_approx(level.player_spawn.global_position))
+	assert(GameHandler.load_level(source, true, source_index, BaseLevel.EntryMode.RESPAWN))
+	assert(GameHandler.current_level.on_complete())
+	assert(GameHandler.current_stage_index == destination_index)
+	assert(GameHandler.current_level.scene_file_path == destination.resource_path)
+	assert(GameHandler.current_level.active_area.area_id == &"main")
+	game.free()
+	await ticks(2)

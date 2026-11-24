@@ -10,11 +10,12 @@
 [ext_resource type="PackedScene" uid="uid://c547aakap4jow" path="res://scenes/levels/worlds/world 1/1-4.tscn" id="5_kjrfb"]
 [ext_resource type="PackedScene" uid="uid://y0wmdsmhed65" path="res://scenes/levels/worlds/world 2/2-1.tscn" id="6_se30j"]
 [ext_resource type="PackedScene" uid="uid://dgxctwwql0ow7" path="res://scenes/levels/worlds/world 2/2-2.tscn" id="7_level"]
+[ext_resource type="PackedScene" uid="uid://bjdxtqxc35io5" path="res://scenes/levels/worlds/world 2/2-3.tscn" id="8_level"]
 
 [node name="Game" type="CanvasLayer" unique_id=445540570]
 layer = 0
 script = ExtResource("1_script")
-stages = Array[PackedScene]([ExtResource("2_level"), ExtResource("3_level"), ExtResource("4_level"), ExtResource("5_kjrfb"), ExtResource("6_se30j"), ExtResource("7_level")])
+stages = Array[PackedScene]([ExtResource("2_level"), ExtResource("3_level"), ExtResource("4_level"), ExtResource("5_kjrfb"), ExtResource("6_se30j"), ExtResource("7_level"), ExtResource("8_level")])
 enemy_limit = 10
 save_entity_state_through_death = false
 integer_scaling = true

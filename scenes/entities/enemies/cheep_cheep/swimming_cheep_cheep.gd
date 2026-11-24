@@ -10,6 +10,8 @@ const BOB_SLOT := 2
 
 @export var red := false
 var initial_bob_down := false
+var initial_horizontal_fraction := 0
+var initial_vertical_fraction := 0
 
 @onready var _knocked_out: EnemyDefeatedState = $StateMachine/KnockedOut
 
@@ -25,6 +27,8 @@ func _ready() -> void:
 	if red:
 		sprite.texture = RED_ART
 	super()
+	_x_fraction = initial_horizontal_fraction
+	_y_fraction = initial_vertical_fraction
 	_origin_y = body.global_position.y
 	_bob_direction = 1 if initial_bob_down else -1
 	if _level != null:
@@ -59,6 +63,10 @@ func _swim_tick() -> void:
 	var height := body.global_position.y - _origin_y
 	if absf(height) >= BOB_RANGE:
 		_bob_direction = -1 if height > 0.0 else 1
+
+
+func movement_fractions() -> Vector2i:
+	return Vector2i(_x_fraction, _y_fraction)
 
 
 func _show_swim_pose() -> void:

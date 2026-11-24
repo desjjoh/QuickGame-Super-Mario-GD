@@ -1,0 +1,4 @@
+[gd_scene format=3]
+[ext_resource type="Script" path="res://scenes/entities/spawners/flying_cheep_cheep_spawner.gd" id="source"]
+[node name="FlyingCheepCheepSpawner" type="Node2D"]
+script = ExtResource("source")

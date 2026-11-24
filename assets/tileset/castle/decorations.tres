@@ -34,6 +34,11 @@ resource_name = "Fence parts"
 texture = ExtResource("art_3")
 2:3/0 = 0
 
+[sub_resource type="TileSetAtlasSource" id="bridge_railings"]
+resource_name = "Bridge railings"
+texture = ExtResource("art_1")
+0:2/0 = 0
+
 [sub_resource type="TileSetAtlasSource" id="Source_3"]
 resource_name = "Hill parts"
 texture = ExtResource("art_1")
@@ -62,3 +67,4 @@ sources/17 = SubResource("liquid_parts")
 sources/18 = SubResource("tree_canopies")
 sources/19 = SubResource("tree_stems")
 sources/20 = SubResource("fence_parts")
+sources/21 = SubResource("bridge_railings")
